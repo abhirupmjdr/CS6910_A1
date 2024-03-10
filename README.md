@@ -15,8 +15,7 @@ Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to
 - `Question1.py`: Displays images of one object from each of the 10 classes using `sweep.log`.
 - `Question2.py`: Implements the forward function, initializing parameters, and predicting class probabilities for input samples.
 - `Question3.py`: Implements the backpropagation algorithm to compute parameter gradients for each layer. Offers various optimization algorithms for gradient descent.
-- `Question4.py`: Utilizes sweep for hyperparameter tuning to achieve optimal model configurations. Generates multiple plots for analysis.
-- `Question5` and `Question6`: Observations are drawn from the graphs obtained in previous stages.
+- `Question4.py`, `Question5`, and `Question6`: Utilizes sweep for hyperparameter tuning to achieve optimal model configurations. Generates multiple plots for analysis and Observations are drawn from the graphs obtained in previous stages.
 - `Question7.py`: Creates a confusion matrix using sweep and provides observations.
 - `Question8.py`: Incorporates mean squared error loss alongside categorical cross-entropy loss. Uses optimal model configurations obtained from sweep for analysis.
 - `Question10.py`: Demonstrates achieving good accuracy on the `mnist` dataset using only three hyperparameter configurations.
