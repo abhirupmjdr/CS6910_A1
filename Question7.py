@@ -1,8 +1,3 @@
-
-!pip install wandb
-
-import wandb
-from wandb.keras import WandbCallback
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay
@@ -12,15 +7,12 @@ import seaborn
 import warnings
 warnings.filterwarnings("ignore")
 
-wandb.login()
-
-
 
 from keras.datasets import fashion_mnist
 (x_train,y_train),(x_test,y_test) = fashion_mnist.load_data()
 
 
-'''normalizing the data'''
+
 x_test = x_test / 255.0
 x_train = x_train / 255.0
 
@@ -32,13 +24,15 @@ x_val_T = x_val.reshape(-1, x_val.shape[1]*x_val.shape[2]).T
 x_test_T = x_test.reshape(-1, x_test.shape[1]*x_test.shape[2]).T
 y_train_T, y_val_T, y_test_T = y_train.reshape(1, -1), y_val.reshape(1, -1), y_test.reshape(1, -1)
 
+
+
 class Util:
 
     @staticmethod
     def apply_activation(A, activation):
             if activation == 'sigmoid':
                 return Compute.sigmoid(A)
-            elif activation == 'relu':
+            elif activation == 'ReLU':
                 return Compute.Relu(A)
             elif activation == 'tanh':
                 return Compute.tanh(A)
@@ -50,7 +44,7 @@ class Util:
             return -np.sum(one_hot_true_output * np.log(predicted_output + 1e-9)) / batch_size
 
 
-        if loss=='squared_loss':
+        if loss=='mean_squared_error':
             one_hot_true_output = np.eye(n_output)[true_output[0]].T
             loss_factor=np.square(predicted_output-one_hot_true_output)
             return np.sum(loss_factor)/batch_size
@@ -127,22 +121,22 @@ class Compute:
                 return dH_prev * Compute.sigmoid_derivative(A_prev)
             elif activation == 'tanh':
                 return dH_prev * Compute.tanh_derivative(A_prev)
-            elif activation == 'relu':
+            elif activation == 'ReLU':
                 return dH_prev * Compute.Relu_derivative(A_prev)
 
 
 class Update:
     @staticmethod
-    def stochastic_gradient_descent(eta,theta,grads,n_layers):
+    def stochastic_gradient_descent(eta,theta,grads,n_layers,weight_decay=0):
         for l in range(1, n_layers):
             W, dW = theta["W" + str(l)], grads["dW" + str(l)]
             b, db = theta["b" + str(l)],grads["db" + str(l)]
-            W -= eta * dW
-            b -= eta * db
+            W -= eta * dW -eta*weight_decay*W
+            b -= eta * db -eta*weight_decay*b
             theta["W" + str(l)], theta["b" + str(l)] = W, b
 
     @staticmethod
-    def nesterov_gradient_descent(my_network,i,eta, batch_size, mom, previous_updates,loss):
+    def nesterov_gradient_descent(my_network,i,eta, batch_size, mom, previous_updates,loss,weight_decay=0):
         theta = {}
         input_data = my_network.TrainInput[:, i:i + batch_size]
         output_data = my_network.TrainOutput[0, i:i + batch_size]
@@ -155,26 +149,26 @@ class Update:
         for l in range(1, my_network.n_layers):
             previous_updates["W" + str(l)] = mom * previous_updates["W" + str(l)] + (1-mom)*my_network.grads["dW" + str(l)]
             previous_updates["b" + str(l)] = mom * previous_updates["b" + str(l)] + (1-mom)*my_network.grads["db" + str(l)]
-            my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)]
-            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)]
+            my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)] -eta*weight_decay*my_network.theta["W" + str(l)]
+            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
         return previous_updates
 
     @staticmethod
-    def momentum_gradient_descent(my_network,eta, mom, previous_updates):
+    def momentum_gradient_descent(my_network,eta, mom, previous_updates,weight_decay=0):
         for l in range(1, my_network.n_layers):
             uW, ub = previous_updates["W" + str(l)], previous_updates["b" + str(l)]
             W, dW = my_network.theta["W" + str(l)], my_network.grads["dW" + str(l)]
             b, db = my_network.theta["b" + str(l)], my_network.grads["db" + str(l)]
             uW = mom * uW + (1-mom) * dW
             ub = mom * ub + (1-mom) * db
-            W -= eta * uW
-            b -= eta * ub
+            W -= eta * uW -eta*weight_decay*W
+            b -= eta * ub  -eta*weight_decay*b
             previous_updates["W" + str(l)], previous_updates["b" + str(l)] = uW, ub
             my_network.theta["W" + str(l)], my_network.theta["b" + str(l)] = W, b
             return previous_updates
 
     @staticmethod
-    def rms_prop(my_network,eta, beta, epsilon, previous_updates):
+    def rms_prop(my_network,eta, beta, epsilon, previous_updates,weight_decay=0):
         for l in range(1, my_network.n_layers):
             previous_updates["W" + str(l)] = beta * previous_updates["W" + str(l)] + (1 - beta) * np.square(
                 my_network.grads["dW" + str(l)])
@@ -182,8 +176,8 @@ class Update:
                 my_network.grads["db" + str(l)])
             factorW = eta / (np.sqrt(previous_updates["W" + str(l)] + epsilon))
             factorb = eta / (np.sqrt(previous_updates["b" + str(l)] + epsilon))
-            my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)]
-            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)]
+            my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
+            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
             return previous_updates
             '''
             Working previously fetched an issue that the previous_updates should be returned
@@ -192,7 +186,7 @@ class Update:
             '''
 
     @staticmethod
-    def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t):
+    def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0):
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
@@ -209,12 +203,12 @@ class Update:
             term1 = 1 - (beta1 ** (t))
             term2 = (1 - beta1) * my_network.grads["dW" + str(l)] / term1
             term3 = (1 - beta1) * my_network.grads["db" + str(l)] / term1
-            my_network.theta["W" + str(l)] -= factorW * (beta1 * MW_corrected + term2)
-            my_network.theta["b" + str(l)] -= factorb * (beta1 * Mb_corrected + term3)
+            my_network.theta["W" + str(l)] -= factorW * (beta1 * MW_corrected + term2) -eta*weight_decay*my_network.theta["W" + str(l)]
+            my_network.theta["b" + str(l)] -= factorb * (beta1 * Mb_corrected + term3) -eta*weight_decay*my_network.theta["b" + str(l)]
         return M, V
 
     @staticmethod
-    def adam(my_network,eta, beta1, beta2, epsilon, M, V, t): #taken from slide-2 page 42 [cs6910]
+    def adam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0): #taken from slide-2 page 42 [cs6910]
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
@@ -224,8 +218,8 @@ class Update:
             Mb_hat = M["b" + str(l)] / (1 - np.power(beta1,t))
             VW_hat = V["W" + str(l)] / (1 - np.power(beta2,t))
             Vb_hat = V["b" + str(l)] / (1 - np.power(beta2,t))
-            my_network.theta["W" + str(l)] -= (eta / (np.sqrt(VW_hat) + epsilon)) * MW_hat
-            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat
+            my_network.theta["W" + str(l)] -= (eta / (np.sqrt(VW_hat) + epsilon)) * MW_hat -eta*weight_decay*my_network.theta["W" + str(l)]
+            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat -eta*weight_decay*my_network.theta["b" + str(l)]
         return M, V
 
 
@@ -243,6 +237,7 @@ class MyNeuralNetwork:
   theta = {}
   cache = {}
   grads = {}
+
 
 
   def __init__(self,mode_of_initialization="random",number_of_hidden_layers=1,num_neurons_in_hidden_layers=4,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T):
@@ -267,7 +262,7 @@ class MyNeuralNetwork:
     for l in range(1,self.n_layers):
       if self.mode_of_initialization == "random":
         self.theta["W" + str(l)] = np.random.randn(self.n_neurons[l] , self.n_neurons[l - 1])
-      elif self.mode_of_initialization == "xavier":
+      elif self.mode_of_initialization == "Xavier":
         limit = np.sqrt(2 / float(self.n_neurons[l - 1] + self.n_neurons[l]))
         self.theta["W" + str(l)] = np.random.normal(0.0, limit, size=(self.n_neurons[l],self.n_neurons[l - 1]))
       self.theta["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
@@ -292,7 +287,7 @@ class MyNeuralNetwork:
   def backpropagation(self, y_predicted, e_y, batch_size, loss, activation, theta):
         if loss == 'cross_entropy':
             dA = y_predicted - e_y
-        elif loss=='squared_loss':
+        elif loss=='mean_squared_error':
             dA=(y_predicted - e_y)*Compute.softmax_derivative(self.cache["A" + str(self.n_layers - 1)])
         m = dA.shape[1]
         self.grads["dA" + str(self.n_layers - 1)] = dA
@@ -308,18 +303,13 @@ class MyNeuralNetwork:
             self.grads["dA" + str(k - 1)] = dA_prev
             self.grads["dW" + str(k)] = dW
             self.grads["db" + str(k)] = db
-            # print("----"*5,k,"-----"*5)
-            # print("dw")
-            # print(dW)
-            # print("db")
-            # print(db)
 
         return
 
 
 
 
-  def compute(self, eta = 0.1,mom=0.5,beta = 0.5,beta1 = 0.5,beta2 = 0.5 ,epsilon = 0.000001, optimizer = 'sgd',batch_size = 4,loss = 'cross_entropy',epochs = 1):
+  def compute(self, eta = 0.1,mom=0.5,beta = 0.5,beta1 = 0.5,beta2 = 0.5 ,epsilon = 0.000001, optimizer = 'sgd',batch_size = 4,weight_decay=0,loss = 'cross_entropy',epochs = 1):
     train_c_epoch, tarin_acc_per_epoch, val_c_per_epoch, val_acc_per_epoch, previous_updates, M, V = [], [], [], [], {}, {}, {}
     for l in range(1 , self.n_layers):
       previous_updates["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
@@ -339,21 +329,21 @@ class MyNeuralNetwork:
         e_y = np.transpose(np.eye(self.n_output)[self.TrainOutput[0,i : i + batch_size]])
         self.backpropagation(yPredicted,e_y,batch_size,loss,self.activation_function,theta)
         if optimizer == 'sgd':   #referred slide page 54
-            Update.stochastic_gradient_descent(eta,self.theta,self.grads,self.n_layers) #working
+            Update.stochastic_gradient_descent(eta,self.theta,self.grads,self.n_layers,weight_decay) #working
         elif optimizer == 'nag':
-            previous_updates=Update.nesterov_gradient_descent(self,i,eta, batch_size, mom, previous_updates,loss) #working
+            previous_updates=Update.nesterov_gradient_descent(self,i,eta, batch_size, mom, previous_updates,loss,weight_decay) #working
 
         elif optimizer == 'momentum': #referred from slide 43
-          previous_updates=Update.momentum_gradient_descent(self,eta,mom,previous_updates) #working
+          previous_updates=Update.momentum_gradient_descent(self,eta,mom,previous_updates,weight_decay) #working
 
-        elif optimizer == 'RMSprop':
-          previous_updates=Update.rms_prop(self,eta,beta,epsilon,previous_updates) #working
+        elif optimizer == 'rmsprop':
+          previous_updates=Update.rms_prop(self,eta,beta,epsilon,previous_updates,weight_decay) #working
         elif optimizer == 'adam':
           epsilon = 1e-10
-          M , V = Update.adam(self,eta,beta1,beta2,epsilon,M , V , count+1)
+          M , V = Update.adam(self,eta,beta1,beta2,epsilon,M , V , count+1,weight_decay)
         elif optimizer == 'nadam':
           epsilon = 1e-8
-          M , V = Update.nadam(self,eta,beta1,beta2,epsilon,M , V , count+1)
+          M , V = Update.nadam(self,eta,beta1,beta2,epsilon,M , V , count+1,weight_decay)
 
       y_hat = self.forward(self.TrainInput,self.activation_function,self.theta)
       valy_hat = self.forward(self.ValInput,self.activation_function,self.theta)
@@ -367,10 +357,7 @@ class MyNeuralNetwork:
       val_acc = Util.accuracy(self.ValInput, self.ValOutput,valy_hat)
       val_acc_per_epoch.append(val_acc)
     #   print(np.eye(self.n_output)[self.ValOutput[0]].T.shape,valy_hat.shape)
-      conf_matrix = confusion_matrix(np.argmax(np.eye(self.n_output)[self.ValOutput[0]].T, axis=0),
-                                np.argmax(valy_hat, axis=0))
 
-      
         # Print confusion matrix
       cm_display = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=["T-shirt/top",
                                                                         "Trouser",
@@ -380,10 +367,7 @@ class MyNeuralNetwork:
                                                                         "Sandal",
                                                                         "Shirt",
                                                                         "Sneaker",
-                                                                        "Bag",
-                                                                        "Ankle boot"])
 
-    # Customize appearance
       cm_display.plot(cmap='Oranges')
       plt.xlabel('Predicted Label', fontsize=14)
       plt.ylabel('True Label', fontsize=14)
@@ -392,17 +376,14 @@ class MyNeuralNetwork:
       plt.tight_layout()
       wandb.log({"Confusion Matrix at epoch"+str(count+1) : plt})
       
-
-
-      print("---------"*20)
-      print(f"Epoch Number = {format(count+1)}")
-      print(f"Training Accuracy = {format(tarin_acc_per_epoch[-1])}")
-      print(f"Validation Accuracy = {format(val_acc_per_epoch[-1])}")
     #   if(count==1):
     #     print(self.cache["A1"])
     #   wandb.log({"training_accuracy": train_acc,"validation_accuracy": val_acc,"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
     return train_c_epoch,tarin_acc_per_epoch,val_c_per_epoch,val_acc_per_epoch
 
 
-my_network = MyNeuralNetwork(mode_of_initialization="xavier",number_of_hidden_layers=4,num_neurons_in_hidden_layers=128,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-train=my_network.compute(eta = 0.001,mom=0.5,beta = 0.9,beta1 = 0.999,beta2 = 0.999 ,epsilon = 0.05, optimizer = 'adam',batch_size = 32,loss = 'cross_entropy',epochs = 5)
+
+my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'rmsprop',batch_size = 32,weight_decay=0.5,loss = 'cross_entropy',epochs = 5)
+
+
