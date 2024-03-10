@@ -24,6 +24,7 @@ Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to
 ## Inputs
 
 The `train.py` script now accepts the following inputs:
+
 Run this using 
 
 `python train.py --wandb_entity myname --wandb_project myprojectname`
