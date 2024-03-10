@@ -51,4 +51,4 @@ Run this using
 
 ## Report Link
 
-The report containing detailed observations and insights can be accessed via the provided link.
+The report containing detailed observations and insights can be accessed via the provided link https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3
