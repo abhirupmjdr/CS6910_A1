@@ -175,12 +175,14 @@ class Update:
             return previous_updates
 
     @staticmethod
+    def update_previous_updates(previous_updates, beta, grads, l, param):
+        key = param + str(l)
+        previous_updates[key] = beta * previous_updates[key] + (1 - beta) * np.square(grads["d" + key])
+        return previous_updates
     def rms_prop(my_network,eta, beta, epsilon, previous_updates,weight_decay=0):
         for l in range(1, my_network.n_layers):
-            previous_updates["W" + str(l)] = beta * previous_updates["W" + str(l)] + (1 - beta) * np.square(
-                my_network.grads["dW" + str(l)])
-            previous_updates["b" + str(l)] = beta * previous_updates["b" + str(l)] + (1 - beta) * np.square(
-                my_network.grads["db" + str(l)])
+            previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "W")
+            previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "b")
             factorW = eta / (np.sqrt(previous_updates["W" + str(l)] + epsilon))
             factorb = eta / (np.sqrt(previous_updates["b" + str(l)] + epsilon))
             my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
@@ -383,7 +385,7 @@ class MyNeuralNetwork:
       print(f"Validation Accuracy = {format(val_acc_per_epoch[-1])}")
     #   if(count==1):
     #     print(self.cache["A1"])
-      wandb.log({"training_accuracy": train_acc,"validation_accuracy": val_acc,"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
+    #   wandb.log({"training_accuracy": train_acc,"validation_accuracy": val_acc,"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
     return train_c_epoch,tarin_acc_per_epoch,val_c_per_epoch,val_acc_per_epoch
 
 
@@ -392,7 +394,7 @@ class MyNeuralNetwork:
 # train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'rmsprop',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
 
 
-
+'''
 def train():
     wandb.init(project = "deep-learning-assignment-1")
     config = wandb.config
@@ -428,3 +430,4 @@ sweep_config = {
 sweep_id = wandb.sweep(sweep_config, project="deep-learning-assignment-1")
 wandb.agent(sweep_id , function = train , count = 50)
 
+'''
