@@ -258,35 +258,40 @@ class MyNeuralNetwork:
   theta = {}
   cache = {}
   grads = {}
+  def initialize_weights(self, l):
+    if self.mode_of_initialization == "random":
+        self.theta["W" + str(l)] = np.random.randn(self.n_neurons[l] , self.n_neurons[l - 1])
+    elif self.mode_of_initialization == "Xavier":
+        limit = np.sqrt(2 / float(self.n_neurons[l - 1] + self.n_neurons[l]))
+        self.theta["W" + str(l)] = np.random.normal(0.0, limit, size=(self.n_neurons[l],self.n_neurons[l - 1]))
 
+  def initialize_biases(self, l):
+    self.theta["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
+
+  def setup_layers(self, number_of_hidden_layers, num_neurons_in_hidden_layers):
+    neuronsPerLayer = [num_neurons_in_hidden_layers] * number_of_hidden_layers
+    self.n_layers = number_of_hidden_layers + 2
+    self.n_neurons = neuronsPerLayer
+    self.n_neurons.append(self.n_output)
+    self.n_neurons.insert(0 , self.n_input)
 
 
   def __init__(self,mode_of_initialization="random",number_of_hidden_layers=1,num_neurons_in_hidden_layers=4,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T):
     self.mode_of_initialization = mode_of_initialization
-    neuronsPerLayer = []
-    for i in range(number_of_hidden_layers):
-      neuronsPerLayer.append(num_neurons_in_hidden_layers)
-    self.n_layers = number_of_hidden_layers + 2
     self.activation_function = activation
     self.TrainInput = TrainInput
     self.TrainOutput = TrainOutput
     self.n_input = TrainInput.shape[0]
     self.n_output = TrainOutput[0,TrainOutput.argmax(axis = 1)[0]] + 1
-    self.n_neurons = neuronsPerLayer
-    self.n_neurons.append(self.n_output)
-    self.n_neurons.insert(0 , self.n_input)
     self.cache["H0"] = TrainInput
     self.cache["A0"] = TrainInput
     self.grads = {}
     self.ValInput = ValInput
     self.ValOutput = ValOutput
+    self.setup_layers(number_of_hidden_layers, num_neurons_in_hidden_layers)
     for l in range(1,self.n_layers):
-      if self.mode_of_initialization == "random":
-        self.theta["W" + str(l)] = np.random.randn(self.n_neurons[l] , self.n_neurons[l - 1])
-      elif self.mode_of_initialization == "Xavier":
-        limit = np.sqrt(2 / float(self.n_neurons[l - 1] + self.n_neurons[l]))
-        self.theta["W" + str(l)] = np.random.normal(0.0, limit, size=(self.n_neurons[l],self.n_neurons[l - 1]))
-      self.theta["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
+        self.initialize_weights( l)
+        self.initialize_biases( l)
 
 
   def forward(self, X, activation, theta):
@@ -390,8 +395,8 @@ class MyNeuralNetwork:
 
 
 
-# my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-# train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'rmsprop',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
+my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="tanh",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'adam',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
 
 
 '''
