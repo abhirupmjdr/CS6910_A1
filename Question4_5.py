@@ -17,9 +17,16 @@ x_test = x_test / 255.0
 x_train = x_train / 255.0
 
 
-'''train set,val set ,test set split'''
-x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=42)
-x_train_T = x_train.reshape(-1, x_train.shape[1]*x_train.shape[2]).T
+def split_data(x_train, y_train, test_size=0.1, random_state=42):
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=test_size, random_state=random_state)
+    return x_train, x_val, y_train, y_val
+
+def reshape_data(x_train):
+    x_train_T = x_train.reshape(-1, x_train.shape[1]*x_train.shape[2]).T
+    return x_train_T
+
+x_train, x_val, y_train, y_val = split_data(x_train, y_train)
+x_train_T = reshape_data(x_train)
 x_val_T = x_val.reshape(-1, x_val.shape[1]*x_val.shape[2]).T
 x_test_T = x_test.reshape(-1, x_test.shape[1]*x_test.shape[2]).T
 y_train_T, y_val_T, y_test_T = y_train.reshape(1, -1), y_val.reshape(1, -1), y_test.reshape(1, -1)
@@ -184,6 +191,21 @@ class Update:
             if not then it is showing validation accuracy as 9.05%
             but after returning this slightly better
             '''
+    ''' calculating the factors for nadam'''
+    def calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon):
+        weight_factor = eta / (np.sqrt(VW_corrected) + epsilon)
+        bias_factor = eta / (np.sqrt(Vb_corrected) + epsilon)
+        return weight_factor, bias_factor
+
+    def calculate_terms_nadam(beta1, t, l, grads):
+        term1 = 1 - (beta1 ** t)
+        weight_term = (1 - beta1) * grads["dW" + str(l)] / term1
+        bias_term = (1 - beta1) * grads["db" + str(l)] / term1
+        return weight_term, bias_term
+
+    def update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay):
+        my_network.theta["W" + str(l)] -= weight_factor * (beta1 * MW_corrected + weight_term) - eta * weight_decay * my_network.theta["W" + str(l)]
+        my_network.theta["b" + str(l)] -= bias_factor * (beta1 * Mb_corrected + bias_term) - eta * weight_decay * my_network.theta["b" + str(l)]
 
     @staticmethod
     def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0):
@@ -198,13 +220,10 @@ class Update:
             VW_corrected = V["W" + str(l)] / (1 - (beta2 ** (t)))
             Vb_corrected = V["b" + str(l)] / (1 - (beta2 ** (t)))
 
-            factorW = eta / (np.sqrt(VW_corrected) + epsilon)
-            factorb = eta / (np.sqrt(Vb_corrected) + epsilon)
-            term1 = 1 - (beta1 ** (t))
-            term2 = (1 - beta1) * my_network.grads["dW" + str(l)] / term1
-            term3 = (1 - beta1) * my_network.grads["db" + str(l)] / term1
-            my_network.theta["W" + str(l)] -= factorW * (beta1 * MW_corrected + term2) -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= factorb * (beta1 * Mb_corrected + term3) -eta*weight_decay*my_network.theta["b" + str(l)]
+            weight_factor, bias_factor = Update.calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon)
+            weight_term, bias_term = Update.calculate_terms_nadam(beta1, t, l, my_network.grads)
+            Update.update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay)
+
         return M, V
 
     @staticmethod
