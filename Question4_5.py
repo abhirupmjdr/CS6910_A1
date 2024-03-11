@@ -142,22 +142,39 @@ class Update:
             b -= eta * db -eta*weight_decay*b
             theta["W" + str(l)], theta["b" + str(l)] = W, b
 
-    @staticmethod
-    def nesterov_gradient_descent(my_network,i,eta, batch_size, mom, previous_updates,loss,weight_decay=0):
+    def compute_theta(my_network, mom, previous_updates):
         theta = {}
-        input_data = my_network.TrainInput[:, i:i + batch_size]
-        output_data = my_network.TrainOutput[0, i:i + batch_size]
         for l in range(1, my_network.n_layers):
             theta["W" + str(l)] = my_network.theta["W" + str(l)] - mom * previous_updates["W" + str(l)]
             theta["b" + str(l)] = my_network.theta["b" + str(l)] - mom * previous_updates["b" + str(l)]
-        y_predicted = my_network.forward(input_data, my_network.activation_function, my_network.theta)
-        e_y = np.transpose(np.eye(my_network.n_output)[output_data])
-        my_network.backpropagation(y_predicted, e_y, batch_size, loss, my_network.activation_function, my_network.theta)
+        return theta
+
+    def compute_previous_updates(my_network, mom, previous_updates):
         for l in range(1, my_network.n_layers):
             previous_updates["W" + str(l)] = mom * previous_updates["W" + str(l)] + (1-mom)*my_network.grads["dW" + str(l)]
             previous_updates["b" + str(l)] = mom * previous_updates["b" + str(l)] + (1-mom)*my_network.grads["db" + str(l)]
+        return previous_updates
+
+    def update_theta(my_network, eta, weight_decay):
+        for l in range(1, my_network.n_layers):
             my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)] -eta*weight_decay*my_network.theta["W" + str(l)]
             my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
+
+    def nesterov_gradient_descent(my_network, i, eta, batch_size, mom, previous_updates, loss, weight_decay=0):
+        input_data = my_network.TrainInput[:, i:i + batch_size]
+        output_data = my_network.TrainOutput[0, i:i + batch_size]
+        
+        theta = Update.compute_theta(my_network, mom, previous_updates)
+        
+        y_predicted = my_network.forward(input_data, my_network.activation_function, theta)
+        e_y = np.transpose(np.eye(my_network.n_output)[output_data])
+        
+        my_network.backpropagation(y_predicted, e_y, batch_size, loss, my_network.activation_function, theta)
+        
+        previous_updates = Update.compute_previous_updates(my_network, mom, previous_updates)
+        
+        Update.update_theta(my_network, eta, weight_decay)
+        
         return previous_updates
 
     @staticmethod
@@ -188,12 +205,7 @@ class Update:
             my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
             my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
             return previous_updates
-            '''
-            Working previously fetched an issue that the previous_updates should be returned
-            if not then it is showing validation accuracy as 9.05%
-            but after returning this slightly better
-            '''
-    ''' calculating the factors for nadam'''
+
     def calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon):
         weight_factor = eta / (np.sqrt(VW_corrected) + epsilon)
         bias_factor = eta / (np.sqrt(Vb_corrected) + epsilon)
@@ -260,10 +272,29 @@ class MyNeuralNetwork:
   grads = {}
   def initialize_weights(self, l):
     if self.mode_of_initialization == "random":
-        self.theta["W" + str(l)] = np.random.randn(self.n_neurons[l] , self.n_neurons[l - 1])
+        # Calculate the shape of the weight matrix
+        shape = (self.n_neurons[l], self.n_neurons[l - 1])
+        # Generate the weight matrix with random values
+        self.theta[f"W{l}"] = np.random.randn(*shape)
     elif self.mode_of_initialization == "Xavier":
-        limit = np.sqrt(2 / float(self.n_neurons[l - 1] + self.n_neurons[l]))
-        self.theta["W" + str(l)] = np.random.normal(0.0, limit, size=(self.n_neurons[l],self.n_neurons[l - 1]))
+        # Calculate the sum of the number of neurons in the current layer and the previous layer
+        neuron_sum = self.n_neurons[l - 1] + self.n_neurons[l]
+
+        # Convert the sum to a float
+        neuron_sum_float = float(neuron_sum)
+
+        # Calculate the divisor for the square root operation
+        divisor = 2 / neuron_sum_float
+
+        # Calculate the limit for the Xavier initialization
+        limit = np.sqrt(divisor)
+
+        # Generate a matrix of random values from the normal distribution
+        # The mean of the distribution is 0.0 and the standard deviation is equal to the limit
+        random_values = np.random.normal(0.0, limit, size=(self.n_neurons[l], self.n_neurons[l - 1]))
+
+        # Assign the matrix of random values to the weights of the l-th layer
+        self.theta["W" + str(l)] = random_values
 
   def initialize_biases(self, l):
     self.theta["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
@@ -282,7 +313,14 @@ class MyNeuralNetwork:
     self.TrainInput = TrainInput
     self.TrainOutput = TrainOutput
     self.n_input = TrainInput.shape[0]
-    self.n_output = TrainOutput[0,TrainOutput.argmax(axis = 1)[0]] + 1
+    # Find the index of the maximum value in each row of TrainOutput
+    max_index_in_each_row = TrainOutput.argmax(axis = 1)
+    # Select the first of these indices
+    first_max_index = max_index_in_each_row[0]
+    # Use this index to index into TrainOutput
+    value_at_max_index = TrainOutput[0, first_max_index]
+
+    self.n_output = value_at_max_index + 1
     self.cache["H0"] = TrainInput
     self.cache["A0"] = TrainInput
     self.grads = {}
@@ -344,7 +382,6 @@ class MyNeuralNetwork:
     for l in range(1 , self.n_layers):
       previous_updates["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
       previous_updates["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
-    for l in range(1 , self.n_layers):
       M["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
       M["b" + str(l)] = np.zeros((self.n_neurons[l] , 1))
       V["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
@@ -355,8 +392,10 @@ class MyNeuralNetwork:
         if i + batch_size > self.TrainInput.shape[1]:
           continue
         theta = self.theta
-        yPredicted = self.forward(self.TrainInput[:,i:i + batch_size],self.activation_function,theta)
-        e_y = np.transpose(np.eye(self.n_output)[self.TrainOutput[0,i : i + batch_size]])
+        train_batch_input = self.TrainInput[:,i:i + batch_size]
+        train_batch_output = self.TrainOutput[0,i : i + batch_size]
+        yPredicted = self.forward(train_batch_input,self.activation_function,theta)
+        e_y = np.transpose(np.eye(self.n_output)[train_batch_output])
         self.backpropagation(yPredicted,e_y,batch_size,loss,self.activation_function,theta)
         if optimizer == 'sgd':   #referred slide page 54
             Update.stochastic_gradient_descent(eta,self.theta,self.grads,self.n_layers,weight_decay) #working
@@ -397,7 +436,7 @@ class MyNeuralNetwork:
 
 
 my_network = MyNeuralNetwork(mode_of_initialization="Xavier",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="tanh",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'adam',batch_size = 32,weight_decay=0.5,loss = 'cross_entropy',epochs = 5)
+train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'nag',batch_size = 32,weight_decay=0.5,loss = 'cross_entropy',epochs = 5)
 
 
 '''
