@@ -1,3 +1,6 @@
+
+import wandb
+from wandb.keras import WandbCallback
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay
@@ -367,7 +370,45 @@ class MyNeuralNetwork:
 
 
 
-my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'rmsprop',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
+# my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+# train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'rmsprop',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
+
+
+def train():
+    wandb.init(project = "deep-learning-assignment-1")
+    config = wandb.config
+    run_name="init_"+(config.mode_of_initialization)+"_l"+str(config.number_of_hidden_layers)+"_node_"+str(config.num_neurons_in_hidden_layers)+"_act_"+config.activation+"_eta_"+str(config.eta)+"_beta_"+str(config.beta)+"_opt_"+config.optimizer+"_bs_"+str(config.batch_size)+"_loss_"+config.loss+"_ep_"+str(config.epochs)
+    with wandb.init(project="deep-learning-assignment-1", name=run_name) as run:
+        my_network = MyNeuralNetwork(mode_of_initialization=config.mode_of_initialization,number_of_hidden_layers=config.number_of_hidden_layers,num_neurons_in_hidden_layers=config.num_neurons_in_hidden_layers,activation=config.activation,TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+        my_network.compute(eta =config.eta,beta = config.beta,beta1 = 0.5,beta2 = 0.5 ,epsilon = 0.05, optimizer = config.optimizer,batch_size =config.batch_size,loss = config.loss,epochs = config.epochs)
+
+
+sweep_config = {
+    'method': 'grid',
+    'name': 'accuracy sweep',
+    'metric': {
+        'goal': 'maximize',
+        'name': 'validation_accuracy'
+        },
+    'parameters': {
+        'mode_of_initialization': {'values': ['xavier']},
+        'number_of_hidden_layers' : {'values' : [5]},
+        'num_neurons_in_hidden_layers' : {'values' : [128]},
+
+        'eta': {'values':[0.0001]},
+        'beta' : {'values' : [0.9]},
+        'optimizer' : {'values' : ['nadam']},
+
+        'batch_size': {'values': [32]},
+        'epochs': {'values': [10]},
+        'loss' : {'values' : ['cross_entropy','squared_loss']},
+        'activation' : {'values' : ['tanh']},
+        'weight_decay' : {'values' : [0]}
+       }
+    }
+
+
+sweep_id = wandb.sweep(sweep_config, project="deep-learning-assignment-1")
+wandb.agent(sweep_id , function = train , count = 2)
 
 

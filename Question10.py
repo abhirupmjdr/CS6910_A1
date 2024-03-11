@@ -1,3 +1,6 @@
+
+import wandb
+from wandb.keras import WandbCallback
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay

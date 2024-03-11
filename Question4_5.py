@@ -1,3 +1,6 @@
+
+import wandb
+from wandb.keras import WandbCallback
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay
@@ -226,17 +229,17 @@ class Update:
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
-            MW_corrected = M["W" + str(l)] / (1 - (beta1 ** (t)))
-            Mb_corrected = M["b" + str(l)] / (1 - (beta1 ** (t)))
+            MW_new = M["W" + str(l)] / (1 - (beta1 ** (t)))
+            Mb_new = M["b" + str(l)] / (1 - (beta1 ** (t)))
 
             V["W" + str(l)] = beta2 * V["W" + str(l)] + (1 - beta2) * np.square(my_network.grads["dW" + str(l)])
             V["b" + str(l)] = beta2 * V["b" + str(l)] + (1 - beta2) * np.square(my_network.grads["db" + str(l)])
-            VW_corrected = V["W" + str(l)] / (1 - (beta2 ** (t)))
-            Vb_corrected = V["b" + str(l)] / (1 - (beta2 ** (t)))
+            VW_new = V["W" + str(l)] / (1 - (beta2 ** (t)))
+            Vb_new = V["b" + str(l)] / (1 - (beta2 ** (t)))
 
-            weight_factor, bias_factor = Update.calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon)
+            weight_factor, bias_factor = Update.calculate_factors_nadam(eta, VW_new, Vb_new, epsilon)
             weight_term, bias_term = Update.calculate_terms_nadam(beta1, t, l, my_network.grads)
-            Update.update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay)
+            Update.update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_new,Mb_new,beta1, weight_term, bias_term, eta, weight_decay)
 
         return M, V
 
@@ -330,42 +333,28 @@ class MyNeuralNetwork:
     for l in range(1,self.n_layers):
         self.initialize_weights( l)
         self.initialize_biases( l)
-  def compute_A_and_update_cache(self, l):    
-    H = self.cache["H" + str(l - 1)]
-    W = self.theta["W" + str(l)]
-    b = self.theta["b" + str(l)]
-    A = np.dot(W, H) + b
-    self.cache["A" + str(l)] = A
 
+    
   def forward(self, X, activation, theta):
     self.cache["H0"] = X
     for l in range(1, self.n_layers):
-        self.compute_A_and_update_cache(l)
+        self.cache["A" + str(l)] = np.dot(self.theta["W" + str(l)], self.cache["H" + str(l - 1)]) + self.theta["b" + str(l)]
         A=self.cache["A" + str(l)]
         H = Util.apply_activation(A, activation)
         self.cache["H" + str(l)] = H
-    Al = self.cache["A" + str(self.n_layers - 1)]
-    y_hat= Compute.softmax(Al)
+    y_hat= Compute.softmax(self.cache["A" + str(self.n_layers - 1)])
 
     return y_hat
-  def extract_grads_and_cache(self, k):
-    dA = self.grads["dA" + str(k)]
-    H_prev = self.cache["H" + str(k - 1)]
-    A_prev = self.cache["A" + str(k - 1)]
-    W = self.theta["W" + str(k)]
-    return dA, H_prev, A_prev, W
 
   def backpropagation(self, y_predicted, e_y, batch_size, loss, activation, theta):
         if loss == 'cross_entropy':
             dA = y_predicted - e_y
         elif loss=='mean_squared_error':
             dA=(y_predicted - e_y)*Compute.softmax_derivative(self.cache["A" + str(self.n_layers - 1)])
-        m = dA.shape[1]
         self.grads["dA" + str(self.n_layers - 1)] = dA
 
         for k in range(self.n_layers - 1, 0, -1):
-            dA, H_prev, A_prev, W = self.extract_grads_and_cache(k)
-
+            dA, H_prev, A_prev, W =self.grads["dA" + str(k)],self.cache["H" + str(k - 1)],self.cache["A" + str(k - 1)],self.theta["W" + str(k)]
             dW, db, dH_prev, dA_prev = Compute.calculate_gradients(k, dA, H_prev, A_prev, W, activation, batch_size)
 
             self.grads["dA" + str(k - 1)] = dA_prev
@@ -430,7 +419,7 @@ class MyNeuralNetwork:
       print(f"Validation Accuracy = {format(val_acc_per_epoch[-1])}")
     #   if(count==1):
     #     print(self.cache["A1"])
-    #   wandb.log({"training_accuracy": tarin_acc_per_epoch[-1],"validation_accuracy": val_acc_per_epoch[-1],"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
+      wandb.log({"training_accuracy": tarin_acc_per_epoch[-1],"validation_accuracy": val_acc_per_epoch[-1],"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
     return train_c_epoch,tarin_acc_per_epoch,val_c_per_epoch,val_acc_per_epoch
 
 
