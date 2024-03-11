@@ -381,11 +381,8 @@ class MyNeuralNetwork:
       train_c_epoch.append(train_cost)
       val_cost = Util.loss(self.ValInput,self.ValOutput,valy_hat,loss,self.ValInput.shape[1],self.n_output)
       val_c_per_epoch.append(val_cost)
-      train_acc = Util.accuracy(self.TrainInput, self.TrainOutput,y_hat)
-      tarin_acc_per_epoch.append(train_acc)
-
-      val_acc = Util.accuracy(self.ValInput, self.ValOutput,valy_hat)
-      val_acc_per_epoch.append(val_acc)
+      tarin_acc_per_epoch.append(Util.accuracy(self.TrainInput, self.TrainOutput,y_hat))
+      val_acc_per_epoch.append(Util.accuracy(self.ValInput, self.ValOutput,valy_hat))
     #   print(np.eye(self.n_output)[self.ValOutput[0]].T.shape,valy_hat.shape)
 
       print("---------"*20)
@@ -394,7 +391,7 @@ class MyNeuralNetwork:
       print(f"Validation Accuracy = {format(val_acc_per_epoch[-1])}")
     #   if(count==1):
     #     print(self.cache["A1"])
-    #   wandb.log({"training_accuracy": train_acc,"validation_accuracy": val_acc,"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
+    #   wandb.log({"training_accuracy": tarin_acc_per_epoch[-1],"validation_accuracy": val_acc_per_epoch[-1],"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
     return train_c_epoch,tarin_acc_per_epoch,val_c_per_epoch,val_acc_per_epoch
 
 
