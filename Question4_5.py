@@ -292,23 +292,30 @@ class MyNeuralNetwork:
     for l in range(1,self.n_layers):
         self.initialize_weights( l)
         self.initialize_biases( l)
-
+  def compute_A_and_update_cache(self, l):    
+    H = self.cache["H" + str(l - 1)]
+    W = self.theta["W" + str(l)]
+    b = self.theta["b" + str(l)]
+    A = np.dot(W, H) + b
+    self.cache["A" + str(l)] = A
 
   def forward(self, X, activation, theta):
     self.cache["H0"] = X
     for l in range(1, self.n_layers):
-        H = self.cache["H" + str(l - 1)]
-        W = self.theta["W" + str(l)]
-        b = self.theta["b" + str(l)]
-        A = np.dot(W, H) + b
-        self.cache["A" + str(l)] = A
+        self.compute_A_and_update_cache(l)
+        A=self.cache["A" + str(l)]
         H = Util.apply_activation(A, activation)
         self.cache["H" + str(l)] = H
     Al = self.cache["A" + str(self.n_layers - 1)]
     y_hat= Compute.softmax(Al)
 
     return y_hat
-
+  def extract_grads_and_cache(self, k):
+    dA = self.grads["dA" + str(k)]
+    H_prev = self.cache["H" + str(k - 1)]
+    A_prev = self.cache["A" + str(k - 1)]
+    W = self.theta["W" + str(k)]
+    return dA, H_prev, A_prev, W
 
   def backpropagation(self, y_predicted, e_y, batch_size, loss, activation, theta):
         if loss == 'cross_entropy':
@@ -319,10 +326,7 @@ class MyNeuralNetwork:
         self.grads["dA" + str(self.n_layers - 1)] = dA
 
         for k in range(self.n_layers - 1, 0, -1):
-            dA = self.grads["dA" + str(k)]
-            H_prev = self.cache["H" + str(k - 1)]
-            A_prev = self.cache["A" + str(k - 1)]
-            W = self.theta["W" + str(k)]
+            dA, H_prev, A_prev, W = self.extract_grads_and_cache(k)
 
             dW, db, dH_prev, dA_prev = Compute.calculate_gradients(k, dA, H_prev, A_prev, W, activation, batch_size)
 
@@ -395,8 +399,8 @@ class MyNeuralNetwork:
 
 
 
-my_network = MyNeuralNetwork(mode_of_initialization="random",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="tanh",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'adam',batch_size = 32,weight_decay=0.5,loss = 'mean_squared_error',epochs = 5)
+my_network = MyNeuralNetwork(mode_of_initialization="Xavier",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="tanh",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'adam',batch_size = 32,weight_decay=0.5,loss = 'cross_entropy',epochs = 5)
 
 
 '''
