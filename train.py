@@ -72,6 +72,8 @@ class Util:
                 return Compute.Relu(A)
             elif activation == 'tanh':
                 return Compute.tanh(A)
+            elif activation == 'identity':
+                return Compute.indentiy(A)
 
     @staticmethod
     def loss(input, true_output, predicted_output, loss, batch_size,n_output):
@@ -111,6 +113,10 @@ class Compute:
     @staticmethod
     def tanh(x):
         return (2 * Compute.sigmoid(2 * x)) - 1
+    
+    @staticmethod
+    def indentiy(x):
+        return x    
 
     @staticmethod
     def softmax_derivative(x):
@@ -129,6 +135,10 @@ class Compute:
     @staticmethod
     def tanh_derivative(x):
         return (1 - (Compute.tanh(x)**2))
+    
+    @staticmethod
+    def identity_derivative(x):
+        return 1
 
     @staticmethod
     def calculate_gradients(k, dA, H_prev, A_prev, W, activation, batch_size):
@@ -159,6 +169,8 @@ class Compute:
                 return dH_prev * Compute.tanh_derivative(A_prev)
             elif activation == 'ReLU':
                 return dH_prev * Compute.Relu_derivative(A_prev)
+            elif activation == 'identity':
+                return dH_prev * Compute.identity_derivative(A_prev)
 
 
 class Update:

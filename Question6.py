@@ -46,6 +46,8 @@ class Util:
                 return Compute.Relu(A)
             elif activation == 'tanh':
                 return Compute.tanh(A)
+            elif activation == 'identity':
+                return Compute.identity(A)
 
     @staticmethod
     def loss(input, true_output, predicted_output, loss, batch_size,n_output):
@@ -85,6 +87,10 @@ class Compute:
     @staticmethod
     def tanh(x):
         return (2 * Compute.sigmoid(2 * x)) - 1
+    
+    @staticmethod 
+    def identity(x):
+        return x
 
     @staticmethod
     def softmax_derivative(x):
@@ -103,6 +109,10 @@ class Compute:
     @staticmethod
     def tanh_derivative(x):
         return (1 - (Compute.tanh(x)**2))
+    
+    @staticmethod
+    def identity_derivative(x):
+        return 1
 
     @staticmethod
     def calculate_gradients(k, dA, H_prev, A_prev, W, activation, batch_size):
@@ -133,6 +143,8 @@ class Compute:
                 return dH_prev * Compute.tanh_derivative(A_prev)
             elif activation == 'ReLU':
                 return dH_prev * Compute.Relu_derivative(A_prev)
+            elif activation == 'identity':
+                return dH_prev * Compute.identity_derivative(A_prev)
 
 
 class Update:
@@ -453,9 +465,9 @@ sweep_config = {
         'epochs': {'values': [5,10]},
         'loss' : {'values' : ['cross_entropy']},
         'optimizer' : {'values' : ['adam','nadam','nag','momentum']},
-        'mode_of_initialization': {'values': ['xavier','random']},
+        'mode_of_initialization': {'values': ['Xavier','random']},
         'number_of_hidden_layers' : {'values' : [3,4,5]},
-        'activation' : {'values' : ['sigmoid','relu','tanh']},
+        'activation' : {'values' : ['sigmoid','relu','tanh','identity']},
         'weight_decay' : {'values' : [0,0.0005,0.5]}
        }
     }
