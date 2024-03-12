@@ -15,27 +15,29 @@ project_name = "cs6910-assignment1"
 entity_name = "cs23m006"
 
 import argparse
-parser = argparse.ArgumentParser(description = 'training the neural network model via train.py')
-parser.add_argument('-wp','--wandb_project')
-parser.add_argument('-we','--wandb_entity')
-parser.add_argument('-d','--dataset')
-parser.add_argument('-e','--epochs',type = int)
-parser.add_argument('-b','--batch_size',type = int)
-parser.add_argument('-l','--loss')
-parser.add_argument('-o','--optimizer')
-parser.add_argument('-lr','--learning_rate',type = float)
-parser.add_argument('-m','--momentum',type = float)
-parser.add_argument('-beta','--beta',type = float)
-parser.add_argument('-beta1','--beta1',type = float)
-parser.add_argument('-beta2','--beta2',type = float)
-parser.add_argument('-eps','--epsilon',type = float)
-parser.add_argument('-w_d','--weight_decay',type = float)
-parser.add_argument('-w_i','--weight_init')
-parser.add_argument('-nhl','--num_layers',type = int)
-parser.add_argument('-sz','--hidden_size',type = int)
-parser.add_argument('-a','--activation')
+parser = argparse.ArgumentParser(description='Argument Parser for my neural network train.py file.')
+
+parser.add_argument('-wp', '--wandb_project', default='cs6910-a1', help='Project name used to track experiments in Weights & Biases dashboard')
+parser.add_argument('-we', '--wandb_entity', default='abhirupmjdr_dl-org', help='Wandb Entity used to track experiments in the Weights & Biases dashboard.')
+parser.add_argument('-d', '--dataset', default='fashion_mnist', choices=["mnist", "fashion_mnist"], help='Dataset to be used for training.')
+parser.add_argument('-e', '--epochs', type=int, default=1, help='Number of epochs to train neural network.')
+parser.add_argument('-b', '--batch_size', type=int, default=4, help='Batch size used to train neural network.')
+parser.add_argument('-l', '--loss', default='cross_entropy', choices=["mean_squared_error", "cross_entropy"], help='Loss function to be used.')
+parser.add_argument('-o', '--optimizer', default='sgd', choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"], help='Optimizer algorithm.')
+parser.add_argument('-lr', '--learning_rate', type=float, default=0.1, help='Learning rate used to optimize model parameters')
+parser.add_argument('-m', '--momentum', type=float, default=0.5, help='Momentum used by momentum and nag optimizers.')
+parser.add_argument('-beta', '--beta', type=float, default=0.5, help='Beta used by rmsprop optimizer')
+parser.add_argument('-beta1', '--beta1', type=float, default=0.5, help='Beta1 used by adam and nadam optimizers.')
+parser.add_argument('-beta2', '--beta2', type=float, default=0.5, help='Beta2 used by adam and nadam optimizers.')
+parser.add_argument('-eps', '--epsilon', type=float, default=0.000001, help='Epsilon used by optimizers.')
+parser.add_argument('-w_d', '--weight_decay', type=float, default=0.0, help='Weight decay used by optimizers.')
+parser.add_argument('-w_i', '--weight_init', default='random', choices=["random", "Xavier"], help='Weight initialization method.')
+parser.add_argument('-nhl', '--num_layers', type=int, default=1, help='Number of hidden layers used in feedforward neural network.')
+parser.add_argument('-sz', '--hidden_size', type=int, default=4, help='Number of hidden neurons in a feedforward layer.')
+parser.add_argument('-a', '--activation', default='sigmoid', choices=["identity", "sigmoid", "tanh", "ReLU"], help='Activation function.')
 
 args = parser.parse_args()
+
 if(args.wandb_entity):  
     entity_name = args.wandb_entity
 if(args.wandb_project):
@@ -276,18 +278,6 @@ class MyNeuralNetwork:
 
 
   def __init__(self,mode_of_initialization="random",number_of_hidden_layers=1,num_neurons_in_hidden_layers=4,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T):
-    if(args.weight_init):
-        mode_of_initialization = args.weight_init
-        # print(mode_of_initialization)
-    if(args.num_layers):
-        number_of_hidden_layers = args.num_layers
-        # print(number_of_hidden_layers)
-    if(args.hidden_size):
-        num_neurons_in_hidden_layers = args.hidden_size
-        # print(num_neurons_in_hidden_layers)
-    if(args.activation):
-        activation = args.activation
-        # print(activation)
     
     self.mode_of_initialization = mode_of_initialization
     neuronsPerLayer = []
@@ -363,40 +353,6 @@ class MyNeuralNetwork:
 
 
   def compute(self, eta = 0.1,mom=0.5,beta = 0.5,beta1 = 0.5,beta2 = 0.5 ,epsilon = 0.000001, optimizer = 'sgd',batch_size = 4,weight_decay=0,loss = 'cross_entropy',epochs = 1):
-    if(args.learning_rate):
-        eta = args.learning_rate
-        # print(eta)
-    if(args.momentum):
-        mom = args.momentum
-        # print(beta)
-    if(args.beta):
-        beta = args.beta    
-        # print(beta)
-    if(args.beta1):
-        beta1 = args.beta1
-        # print(beta1)
-    if(args.beta2):
-        beta2 = args.beta2
-        # print(beta2)
-    if(args.epsilon):
-        epsilon = args.epsilon
-        # print(epsilon)
-    if(args.batch_size):
-        batch_size = args.batch_size
-        # print(batch_size)
-    if(args.epochs):
-        epochs = args.epochs
-        # print(epochs)
-    if(args.loss):
-        loss = args.loss
-        # print(loss)
-    if(args.optimizer):
-        optimizer = args.optimizer
-        # print(optimizer)
-    if(args.weight_decay):
-        weight_decay = args.weight_decay
-        # print(weight_decay)
-    
     train_c_epoch, tarin_acc_per_epoch, val_c_per_epoch, val_acc_per_epoch, previous_updates, M, V = [], [], [], [], {}, {}, {}
     for l in range(1 , self.n_layers):
       previous_updates["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
@@ -456,7 +412,7 @@ class MyNeuralNetwork:
 
 
 
-my_network = MyNeuralNetwork(mode_of_initialization="Xavier",number_of_hidden_layers=4,num_neurons_in_hidden_layers=128,activation="ReLU",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-train=my_network.compute(eta = 0.001,mom=0.5,beta = 0.9,beta1 = 0.999,beta2 = 0.999 ,epsilon = 0.05, optimizer = 'adam',batch_size = 32,weight_decay=0,loss = 'cross_entropy',epochs = 5)
+my_network = MyNeuralNetwork(mode_of_initialization=args.weight_init,number_of_hidden_layers=args.num_layers,num_neurons_in_hidden_layers=args.hidden_size,activation=args.activation,TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
+train=my_network.compute(eta = args.learning_rate,mom=args.momentum,beta = args.beta,beta1 = args.beta1,beta2 = args.beta2 ,epsilon = args.epsilon, optimizer = args.optimizer,batch_size =args.batch_size,weight_decay=args.weight_decay,loss = args.loss,epochs = args.epochs)
 
 
