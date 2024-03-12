@@ -408,57 +408,21 @@ class MyNeuralNetwork:
       val_c_per_epoch.append(val_cost)
       tarin_acc_per_epoch.append(Util.accuracy(self.TrainInput, self.TrainOutput,y_hat))
       val_acc_per_epoch.append(Util.accuracy(self.ValInput, self.ValOutput,valy_hat))
-    #   print(np.eye(self.n_output)[self.ValOutput[0]].T.shape,valy_hat.shape)
+
 
       print("---------"*20)
       print(f"Epoch  = {format(count+1)}")
       print(f"Training Accuracy = {format(tarin_acc_per_epoch[-1])}")
       print(f"Validation Accuracy = {format(val_acc_per_epoch[-1])}")
-    #   if(count==1):
-    #     print(self.cache["A1"])
-    #   wandb.log({"training_accuracy": tarin_acc_per_epoch[-1],"validation_accuracy": val_acc_per_epoch[-1],"training_loss":train_cost,"validation_loss": val_cost,"epoch": count})
     return train_c_epoch,tarin_acc_per_epoch,val_c_per_epoch,val_acc_per_epoch
 
 
 
 my_network = MyNeuralNetwork(mode_of_initialization="Xavier",number_of_hidden_layers=3,num_neurons_in_hidden_layers=128,activation="tanh",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
 train=my_network.compute(eta = 0.0001,mom=0.5,beta = 0.9,beta1 = 0.9,beta2 = 0.9,epsilon =1e-9, optimizer = 'nag',batch_size = 32,weight_decay=0.5,loss = 'cross_entropy',epochs = 5)
-
-
+ 
 '''
-def train():
-    wandb.init(project = "deep-learning-assignment-1")
-    config = wandb.config
-    run_name="init_"+(config.mode_of_initialization)+"_l"+str(config.number_of_hidden_layers)+"_node_"+str(config.num_neurons_in_hidden_layers)+"_act_"+config.activation+"_eta_"+str(config.eta)+"_beta_"+str(config.beta)+"_opt_"+config.optimizer+"_bs_"+str(config.batch_size)+"_loss_"+config.loss+"_ep_"+str(config.epochs)
-    with wandb.init(project="deep-learning-assignment-1", name=run_name) as run:
-        my_network = MyNeuralNetwork(mode_of_initialization=config.mode_of_initialization,number_of_hidden_layers=config.number_of_hidden_layers,num_neurons_in_hidden_layers=config.num_neurons_in_hidden_layers,activation=config.activation,TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T)
-        my_network.compute(eta =config.eta,beta = config.beta,beta1 = 0.5,beta2 = 0.5 ,epsilon = 0.05, optimizer = config.optimizer,batch_size =config.batch_size,weight_decay=config.weight_decay, loss = config.loss,epochs = config.epochs)
-
-
-sweep_config = {
-    'method': 'random',
-    'name': 'accuracy sweep',
-    'metric': {
-        'goal': 'maximize',
-        'name': 'validation_accuracy'
-        },
-    'parameters': {
-        'eta': {'values':[0.001,0.0001]},
-        'beta' : {'values' : [0.05,0.9,0.99,0.999]},
-        'num_neurons_in_hidden_layers' : {'values' : [32,64,128]},
-        'batch_size': {'values': [16,32,64]},
-        'epochs': {'values': [5,10]},
-        'loss' : {'values' : ['cross_entropy']},
-        'optimizer' : {'values' : ['adam','nadam','nag','momentum']},
-        'mode_of_initialization': {'values': ['xavier','random']},
-        'number_of_hidden_layers' : {'values' : [3,4,5]},
-        'activation' : {'values' : ['sigmoid','relu','tanh']},
-        'weight_decay' : {'values' : [0,0.0005,0.5]}
-       }
-    }
-
-
-sweep_id = wandb.sweep(sweep_config, project="deep-learning-assignment-1")
-wandb.agent(sweep_id , function = train , count = 50)
-
+    This is simple backprop code with different optimizers and activation functions.
+    so we have not to use anything related to wandb 
 '''
+

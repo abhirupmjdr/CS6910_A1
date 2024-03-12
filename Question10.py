@@ -19,8 +19,7 @@ from keras.datasets import fashion_mnist
 x_test = x_test / 255.0
 x_train = x_train / 255.0
 
-
-'''train set,val set ,test set split'''
+# Split the training data into training and validation sets
 x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=42)
 x_train_T = x_train.reshape(-1, x_train.shape[1]*x_train.shape[2]).T
 x_val_T = x_val.reshape(-1, x_val.shape[1]*x_val.shape[2]).T

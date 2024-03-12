@@ -3,7 +3,6 @@
 # import wandb
 import matplotlib.pyplot as plt
 from keras.datasets import fashion_mnist
-from sklearn.model_selection import train_test_split
 import numpy as np
 
 # wandb.login()
@@ -42,5 +41,8 @@ for i in range(len(class_names)):
     plt.imshow(train_input[idx],cmap='gray')
     plt.title(class_names[i])
     plt.axis("off")
-
+'''
+here wandb is used for logging the sample images
+'''
 wandb.log({"Sample Images": plt})
+
