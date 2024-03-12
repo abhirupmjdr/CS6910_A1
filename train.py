@@ -18,7 +18,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Argument Parser for my neural network train.py file.')
 
 parser.add_argument('-wp', '--wandb_project', default='cs6910-a1', help='Project name used to track experiments in Weights & Biases dashboard')
-parser.add_argument('-we', '--wandb_entity', default='abhirupmjdr_dl-org', help='Wandb Entity used to track experiments in the Weights & Biases dashboard.')
+parser.add_argument('-we', '--wandb_entity', default='abhirupmjdr_dl', help='Wandb Entity used to track experiments in the Weights & Biases dashboard.')
 parser.add_argument('-d', '--dataset', default='fashion_mnist', choices=["mnist", "fashion_mnist"], help='Dataset to be used for training.')
 parser.add_argument('-e', '--epochs', type=int, default=1, help='Number of epochs to train neural network.')
 parser.add_argument('-b', '--batch_size', type=int, default=4, help='Batch size used to train neural network.')
