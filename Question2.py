@@ -165,12 +165,11 @@ class NeuralNetwork:
     def forward(self, X):
         self.cache["H0"] = X
         for l in range(1, self.n_layers):
-            H = self.cache["H" + str(l - 1)]
             W = self.theta["W" + str(l)]
+            H = self.cache["H" + str(l - 1)]
             b = self.theta["b" + str(l)]
-            A = np.dot(W, H) + b
-            self.cache["A" + str(l)] = A
-            H = Util.apply_activation(A, self.activation_function)
+            self.cache["A" + str(l)] = np.dot(W, H) + b
+            H = Util.apply_activation(self.cache["A" + str(l)], self.activation_function)
             self.cache["H" + str(l)] = H
         Al = self.cache["A" + str(self.n_layers - 1)]
         y_hat= Compute.softmax(Al)
