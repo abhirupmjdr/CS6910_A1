@@ -406,10 +406,10 @@ class MyNeuralNetwork:
         elif optimizer == 'rmsprop':
           previous_updates=Update.rms_prop(self,eta,beta,epsilon,previous_updates,weight_decay) #working
         elif optimizer == 'adam':
-          epsilon = 1e-10
+
           M , V = Update.adam(self,eta,beta1,beta2,epsilon,M , V , count+1,weight_decay)
         elif optimizer == 'nadam':
-          epsilon = 1e-8
+
           M , V = Update.nadam(self,eta,beta1,beta2,epsilon,M , V , count+1,weight_decay)
 
       y_hat = self.forward(self.TrainInput,self.activation_function,self.theta)
