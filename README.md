@@ -107,7 +107,7 @@ Given the following where in Name column two commands are given for each hyperpa
 | `--activation` (`-a`)     | sigmoid       | Activation function used. Choices: ["identity", "sigmoid", "tanh", "ReLU"] |
 
 
-## Report
+## Project Report (on Wandb)
 
 The report containing detailed observations and insights can be accessed [here](https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3)
 
