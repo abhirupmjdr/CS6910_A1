@@ -22,17 +22,45 @@ Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to
 - `Question8.py`: Incorporates mean squared error loss alongside categorical cross-entropy loss. Uses optimal model configurations obtained from sweep for analysis.
 - `Question10.py`: Demonstrates achieving good accuracy on the `mnist` dataset using only three hyperparameter configurations.
 
-## Inputs
 
-The `train.py` script now accepts the following inputs:
 
-Run this using 
+## Deployment
+
+To deploy this project run `train.py` using,
 
 
 ```
 python train.py --wandb_entity myname --wandb_project myprojectname
 ```
 
+but before running the project you need need to run the followings to satisfy your module needs,
+
+For conda enviroment you can run the following,
+
+```
+conda install numpy
+conda install wandb
+conda install sklearn
+conda install matplotlib
+conda install warnings
+conda install keras
+conda install tensorflow
+```
+
+For google-colab or kaggle or any other notebooks you can use the following commands
+
+```
+!pip install numpy
+!pip install wandb
+!pip install sklearn
+!pip install matplotlib
+!pip install warnings
+!pip install keras
+!pip install tensorflow
+
+```
+
+**Note:** We are not using `tensorflow` in our code but it is required for wandb
 
 the above code will work with the default value that s=is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
 
@@ -58,6 +86,7 @@ or,
 python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"
 ```
 
+Given the following where in Name column two commands are given for each hyperparameters and also for dataset. you need write the commands followed by the arguments
 
 | Name                      | Default Value | Description                                                              |
 |---------------------------|---------------|--------------------------------------------------------------------------|
@@ -79,7 +108,30 @@ python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 6
 | `--hidden_size` (`-sz`)   | 4             | Number of hidden neurons in a feedforward layer.                       |
 | `--activation` (`-a`)     | sigmoid       | Activation function used. Choices: ["identity", "sigmoid", "tanh", "ReLU"] |
 
-## Report Link
 
-The report containing detailed observations and insights can be accessed via the provided link https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3
+## Report
+
+The report containing detailed observations and insights can be accessed [here](https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3)
+
+## Acknowledgements
+
+ - [CS6910: Deep Learning](https://www.cse.iitm.ac.in/~miteshk/CS6910.html)
+ - [README templetes](https://github.com/matiassingers/awesome-readme)
+ - Instructed by [Mitesh Khapra](https://www.cse.iitm.ac.in/~miteshk/)
+ - Deep Learning TAs
+
+## FAQ
+
+#### Is this code platfrom independent?
+
+Yes, you can run it in your Mac, Windows, or linux machine. Also you can use it in google-colab or kaggle
+
+#### Do we need to download all `.py` files?
+
+No, only `train.py` file is sufficient but you can also see the implementation from other files.
+
+#### Can we add more functions ?
+
+Yes, you can as many optimization and/or activation functions you want to. You just need to write the implementationand pass the parameters.
+
 
