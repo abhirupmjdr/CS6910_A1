@@ -28,30 +28,10 @@ The `train.py` script now accepts the following inputs:
 
 Run this using 
 
-<div>
-    <button class="btn-copy" onclick="copyCommand()">Copy</button>
-    <pre id="command">
-        python train.py --wandb_entity myname --wandb_project myprojectname
-    </pre>
-</div>
 
-<script>
-function copyCommand() {
-    const command = document.getElementById('command');
-    const textArea = document.createElement('textarea');
-    textArea.value = command.textContent.trim();
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    const button = document.querySelector('.btn-copy');
-    button.textContent = 'Copied!';
-    setTimeout(() => {
-        button.textContent = 'Copy';
-    }, 2000);
-}
-</script>
-
+```
+python train.py --wandb_entity myname --wandb_project myprojectname
+```
 
 
 the above code will work with the default value that s=is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
