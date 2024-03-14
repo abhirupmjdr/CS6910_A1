@@ -38,18 +38,26 @@ the above code will work with the default value that s=is given into the default
 
 Next, you can customize parameters according to your choice like for an example let say you want to do 5 `epochs` so we need to use the following code,
 
-`python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5`
-
+```
+python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5`
+```
 or,
 
-`python train.py --wandb_entity myname --wandb_project myprojectname -e 5`
+```
+python train.py --wandb_entity myname --wandb_project myprojectname -e 5
+```
 
 you can use multiple parameters to get your desired output.Let say you want to do 5 `epochs` having 4 layers of neurons and in each layer there are 64 nodes with the activation function as tanh, then you need to use the following code,
-`python train.py --wandb_entity myname --wandb_project myprojectname --num_layers 4 --hidden_size 64 --activation "tanh"`
+```
+python train.py --wandb_entity myname --wandb_project myprojectname --num_layers 4 --hidden_size 64 --activation "tanh"
+```
 
 or, 
 
-`python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"`
+```
+python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"
+```
+
 
 | Name                      | Default Value | Description                                                              |
 |---------------------------|---------------|--------------------------------------------------------------------------|
