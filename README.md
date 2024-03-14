@@ -1,3 +1,5 @@
+<script src="copy.js"></script>
+
 ## Description
 
 This codebase presents a neural network class designed for classification tasks. It offers functionalities for initializing weights, forward propagation, and backpropagation. Various optimization algorithms such as stochastic gradient descent (SGD), momentum, Nesterov accelerated gradient (NAG), RMSprop, Adam, and Nadam are implemented to update the network parameters. The training script `train.py` allows for easy training of a classification model using either the `mnist` or `fashion_mnist` dataset. Additionally, the script facilitates customization of parameters through user input or via default values.
@@ -26,7 +28,31 @@ The `train.py` script now accepts the following inputs:
 
 Run this using 
 
-`python train.py --wandb_entity myname --wandb_project myprojectname`
+<div>
+    <button class="btn-copy">Copy</button>
+    <pre>
+       python train.py --wandb_entity myname --wandb_project myprojectname
+    </pre>
+</div>
+
+
+
+the above code will work with the default value that s=is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
+
+Next, you can customize parameters according to your choice like for an example let say you want to do 5 `epochs` so we need to use the following code,
+
+`python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5`
+
+or,
+
+`python train.py --wandb_entity myname --wandb_project myprojectname -e 5`
+
+you can use multiple parameters to get your desired output.Let say you want to do 5 `epochs` having 4 layers of neurons and in each layer there are 64 nodes with the activation function as tanh, then you need to use the following code,
+`python train.py --wandb_entity myname --wandb_project myprojectname --num_layers 4 --hidden_size 64 --activation "tanh"`
+
+or, 
+
+`python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"`
 
 | Name                      | Default Value | Description                                                              |
 |---------------------------|---------------|--------------------------------------------------------------------------|
