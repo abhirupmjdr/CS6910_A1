@@ -4,15 +4,10 @@
 
 This codebase presents a neural network class designed for classification tasks. It offers functionalities for initializing weights, forward propagation, and backpropagation. Various optimization algorithms such as stochastic gradient descent (SGD), momentum, Nesterov accelerated gradient (NAG), RMSprop, Adam, and Nadam are implemented to update the network parameters. The training script `train.py` allows for easy training of a classification model using either the `mnist` or `fashion_mnist` dataset. Additionally, the script facilitates customization of parameters through user input or via default values.
 
-## Training Model
-
-Execute `train.py` to train a classification model, specifying the dataset (`mnist` or `fashion_mnist`) and customizing parameters as needed. After training, it generates five plots illustrating training accuracy, validation accuracy, training cost, validation cost, and epochs with step count.
-
 ## Question Tasks
 
 Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
-
-## Script Descriptions
+Given the question with description of the question,
 
 - `Question1.py`: Displays images of one object from each of the 10 classes using `sweep.log`.
 - `Question2.py`: Implements the forward function, initializing parameters, and predicting class probabilities for input samples.
@@ -24,16 +19,10 @@ Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to
 
 
 
-## Deployment
-
-To deploy this project run `train.py` using,
+## Installation
 
 
-```
-python train.py --wandb_entity myname --wandb_project myprojectname
-```
-
-but before running the project you need need to run the followings to satisfy your module needs,
+Before running the project you need need to run the followings to satisfy your module needs,
 
 For conda enviroment you can run the following,
 
@@ -62,7 +51,16 @@ For google-colab or kaggle or any other notebooks you can use the following comm
 
 **Note:** We are not using `tensorflow` in our code but it is required for wandb
 
-the above code will work with the default value that s=is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
+## Running the model
+
+To deploy this project run `train.py` using,
+
+
+```
+python train.py --wandb_entity myname --wandb_project myprojectname
+```
+
+the above code will work with the default value that is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
 
 Next, you can customize parameters according to your choice like for an example let say you want to do 5 `epochs` so we need to use the following code,
 
@@ -122,15 +120,15 @@ The report containing detailed observations and insights can be accessed [here](
 
 ## FAQ
 
-#### Is this code platfrom independent?
+#### 1. Is this code platfrom independent?
 
 Yes, you can run it in your Mac, Windows, or linux machine. Also you can use it in google-colab or kaggle
 
-#### Do we need to download all `.py` files?
+#### 2. Do we need to download all `.py` files?
 
 No, only `train.py` file is sufficient but you can also see the implementation from other files.
 
-#### Can we add more functions ?
+#### 3. Can we add more functions ?
 
 Yes, you can as many optimization and/or activation functions you want to. You just need to write the implementationand pass the parameters.
 
