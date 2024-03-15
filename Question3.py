@@ -12,31 +12,34 @@ from keras.datasets import fashion_mnist
 (x_train,y_train),(x_test,y_test) = fashion_mnist.load_data()
 
 
+'''
+The division by 255.0 is a normalization step for the input data.
+In the context of image data, pixel values are often stored as 8-bit integers in 
+the range 0 to 255. By dividing by 255, we scale these values to the range 0-1. 
+This is a common preprocessing step for neural network inputs, 
+as it can make the training process more stable and efficient.
+'''
 
 x_test = x_test / 255.0
 x_train = x_train / 255.0
 
+'''
+Here at first we are splitting the training data into training and validation data
+then, Reshaping the training, validation, and test input data and then transpose it
+after this Reshaping the training, validation, and test output data
 
-def split_data(x_train, y_train, test_size=0.1, random_state=42):
-    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=test_size, random_state=random_state)
-    return x_train, x_val, y_train, y_val
-
-def reshape_data(x_train):
-    x_train_T = x_train.reshape(-1, x_train.shape[1]*x_train.shape[2]).T
-    return x_train_T
-
-x_train, x_val, y_train, y_val = split_data(x_train, y_train)
-x_train_T = reshape_data(x_train)
+'''
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=42)
+x_train_T = x_train.reshape(-1, x_train.shape[1]*x_train.shape[2]).T
 x_val_T = x_val.reshape(-1, x_val.shape[1]*x_val.shape[2]).T
 x_test_T = x_test.reshape(-1, x_test.shape[1]*x_test.shape[2]).T
 y_train_T, y_val_T, y_test_T = y_train.reshape(1, -1), y_val.reshape(1, -1), y_test.reshape(1, -1)
-
-
 
 class Util:
 
     @staticmethod
     def apply_activation(A, activation):
+        # Apply the specified activation function to the input which is the output of a layer in the neural network
             if activation == 'sigmoid':
                 return Compute.sigmoid(A)
             elif activation == 'ReLU':
@@ -44,10 +47,24 @@ class Util:
             elif activation == 'tanh':
                 return Compute.tanh(A)
             elif activation == 'identity':
-                return Compute.identity(A)  
+                return Compute.indentiy(A)
 
     @staticmethod
     def loss(input, true_output, predicted_output, loss, batch_size,n_output):
+        """
+        Calculate the specified loss function between the true output and the predicted output.
+
+        Parameters:
+        input: The input to the neural network.
+        true_output: The true output of the neural network.
+        predicted_output: The output predicted by the neural network.
+        loss: The name of the loss function to calculate.
+        batch_size: The size of the batch for each iteration of training.
+        n_output: The number of output units in the neural network.
+
+        Returns:
+        The calculated loss.
+        """
         if loss == 'cross_entropy':
             one_hot_true_output = np.eye(n_output)[true_output[0]].T
             return -np.sum(one_hot_true_output * np.log(predicted_output + 1e-9)) / batch_size
@@ -60,80 +77,136 @@ class Util:
 
     @staticmethod
     def accuracy(input, true_output, predicted_output):
+        """
+        Calculate the accuracy of the predicted output compared to the true output.
+
+        Parameters:
+        input: The input to the neural network.
+        true_output: The true output of the neural network.
+        predicted_output: The output predicted by the neural network.
+
+        Returns:
+        The calculated accuracy as a percentage.
+        """
         predicted_labels = np.argmax(predicted_output, axis=0)
         correct_predictions = np.sum(true_output == predicted_labels)
         total_samples = true_output.shape[1]
         accuracy_percentage = (correct_predictions / total_samples) * 100
         return accuracy_percentage
 
+'''
+This class contains the different activation functions used in the neural network
+The different activation functions used are:
+1. Sigmoid
+2. Softmax
+3. ReLU
+4. tanh
+5. Identity
 
+The class also contains the derivatives of the different activation functions, which are used in the backpropagation algorithm
+
+'''
 class Compute:
 
     @staticmethod
     def sigmoid(x):
+        # sigmoid function Implementation used in hidden layers of the neural network
         return  1 / (1 + np.exp(-x))
 
     @staticmethod
     def softmax(x):
+        # softmax function Implementation which is used in the output layer of the neural network
         return np.exp(x) / np.sum(np.exp(x), axis=0)
 
     @staticmethod
     def Relu(x):
+        # relu function Implementation which is used in the hidden layers of the neural network
         return np.maximum(x,0)
 
     @staticmethod
     def tanh(x):
+        # tanh function Implementation which is used in the hidden layers of the neural network
         return (2 * Compute.sigmoid(2 * x)) - 1
     
     @staticmethod
-    def identity(x):
-        return x
+    def indentiy(x):
+        # identity function Implementation which is used in the hidden layers of the neural network
+        return x    
 
     @staticmethod
     def softmax_derivative(x):
+        # softmax derivative function Implementation which is used in the backpropagation algorithm in the output layer of the neural network
         return Compute.softmax(x) * (1-Compute.softmax(x))
 
     @staticmethod
     def sigmoid_derivative(Z):
+        # sigmoid derivative function Implementation which is used in the backpropagation algorithm in the hidden layers of the neural network
         s = Compute.sigmoid(Z)
         dA = s * (1 - s)
         return dA
 
     @staticmethod
     def Relu_derivative(x):
+        # relu derivative function Implementation which is used in the backpropagation algorithm in the hidden layers of the neural network
         return 1*(x > 0)
 
     @staticmethod
     def tanh_derivative(x):
+        # tanh derivative function Implementation which is used in the backpropagation algorithm in the hidden layers of the neural network
         return (1 - (Compute.tanh(x)**2))
     
     @staticmethod
     def identity_derivative(x):
-        return 1    
+        # identity derivative function Implementation which is used in the backpropagation algorithm in the hidden layers of the neural network
+        return 1
 
     @staticmethod
     def calculate_gradients(k, dA, H_prev, A_prev, W, activation, batch_size):
-            dW = Compute.calculate_dW(dA, H_prev, batch_size)
-            db = Compute.calculate_db(dA, batch_size)
-            dH_prev, dA_prev = Compute.calculate_dH_prev_dA_prev(k, W, dA, activation, A_prev) if k > 1 else (np.zeros(H_prev.shape), np.zeros(A_prev.shape))
+        """
+        Calculate the gradients for the weights and biases of the neural network for the current layer.
+        This is used in the backpropagation algorithm.
 
-            return dW, db, dH_prev, dA_prev
+        Parameters:
+        k: The current layer number.
+        dA: The derivative of the activation function.
+        H_prev: The previous hidden state.
+        A_prev: The previous activation.
+        W: The weights of the current layer.
+        activation: The activation function used in the current layer.
+        batch_size: The size of the batch for each iteration of training.
+
+        Returns:
+        dW: The gradient of the weights.
+        db: The gradient of the biases.
+        dH_prev: The gradient of the previous hidden state.
+        dA_prev: The gradient of the previous activation.
+
+        """
+        dW = Compute.calculate_dW(dA, H_prev, batch_size)
+        db = Compute.calculate_db(dA, batch_size)
+        dH_prev, dA_prev = Compute.calculate_dH_prev_dA_prev(k, W, dA, activation, A_prev) if k > 1 else (np.zeros(H_prev.shape), np.zeros(A_prev.shape))
+
+        return dW, db, dH_prev, dA_prev
     @staticmethod
     def calculate_dW(dA, H_prev, batch_size):
+            # Calculate the gradient of the weights used in the backpropagation algorithm
             return np.dot(dA, H_prev.T) / batch_size
 
     @staticmethod
     def calculate_db(dA, batch_size):
+            # Calculate the gradient of the biases used in the backpropagation algorithm
             return np.sum(dA, axis=1, keepdims=True) / batch_size
 
     @staticmethod
     def calculate_dH_prev_dA_prev(k, W, dA, activation, A_prev):
+            # Calculate the gradient of the previous hidden state and activation used in the backpropagation algorithm
             dH_prev = np.matmul(W.T, dA)
             dA_prev = Compute.calculate_dA_prev(dH_prev, activation, A_prev)
             return dH_prev, dA_prev
 
     @staticmethod
     def calculate_dA_prev(dH_prev, activation, A_prev):
+            # Calculate the gradient of the previous activation used in the backpropagation algorithm
             if activation == 'sigmoid':
                 return dH_prev * Compute.sigmoid_derivative(A_prev)
             elif activation == 'tanh':
@@ -143,36 +216,77 @@ class Compute:
             elif activation == 'identity':
                 return dH_prev * Compute.identity_derivative(A_prev)
 
+'''
+This class contains the update rules for the different optimizers used to train the neural network
+The different optimizers used are:
+1. Stochastic Gradient Descent  
+2. Nesterov Accelerated Gradient Descent 
+3. Momentum Gradient Descent
+4. RMSProp
+5. Adam
+6. Nadam
 
+'''
 class Update:
     @staticmethod
     def stochastic_gradient_descent(eta,theta,grads,n_layers,weight_decay=0):
+        """
+        Implements the Stochastic Gradient Descent (SGD) optimization algorithm for training a neural network.
+
+        Parameters:
+        eta: The learning rate.
+        theta: The parameters of the neural network.
+        grads: The gradients of the parameters.
+        n_layers: The number of layers in the neural network.
+        weight_decay: A regularization parameter (default is 0).
+
+        """
         for l in range(1, n_layers):
             W, dW = theta["W" + str(l)], grads["dW" + str(l)]
             b, db = theta["b" + str(l)],grads["db" + str(l)]
             W -= eta * dW -eta*weight_decay*W
             b -= eta * db -eta*weight_decay*b
             theta["W" + str(l)], theta["b" + str(l)] = W, b
-
+    # computing the theta for specifically nesterov accelerated gradient descent
     def compute_theta(my_network, mom, previous_updates):
         theta = {}
         for l in range(1, my_network.n_layers):
             theta["W" + str(l)] = my_network.theta["W" + str(l)] - mom * previous_updates["W" + str(l)]
             theta["b" + str(l)] = my_network.theta["b" + str(l)] - mom * previous_updates["b" + str(l)]
         return theta
-
+    # computing the previous updates for specifically nesterov accelerated gradient descent
     def compute_previous_updates(my_network, mom, previous_updates):
         for l in range(1, my_network.n_layers):
             previous_updates["W" + str(l)] = mom * previous_updates["W" + str(l)] + (1-mom)*my_network.grads["dW" + str(l)]
             previous_updates["b" + str(l)] = mom * previous_updates["b" + str(l)] + (1-mom)*my_network.grads["db" + str(l)]
         return previous_updates
-
+    
+    #updating the weights and biases based on the gradients using the nesterov accelerated gradient descent algorithm
     def update_theta(my_network, eta, weight_decay):
         for l in range(1, my_network.n_layers):
             my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)] -eta*weight_decay*my_network.theta["W" + str(l)]
             my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
 
     def nesterov_gradient_descent(my_network, i, eta, batch_size, mom, previous_updates, loss, weight_decay=0):
+
+        """
+            Implements the Nesterov Accelerated Gradient Descent optimization algorithm for training a neural network.
+
+            Parameters:
+            my_network: The neural network to be trained.
+            i: The current iteration.
+            eta: The learning rate.
+            batch_size: The size of the batch for each iteration of training.
+            mom: The momentum factor.
+            previous_updates: Dictionary to store the previous updates.
+            loss: The loss function to be minimized.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            previous_updates: Updated dictionary with the previous updates.
+
+        """
+
         input_data = my_network.TrainInput[:, i:i + batch_size]
         output_data = my_network.TrainOutput[0, i:i + batch_size]
         
@@ -191,6 +305,22 @@ class Update:
 
     @staticmethod
     def momentum_gradient_descent(my_network,eta, mom, previous_updates,weight_decay=0):
+
+        """
+        Implements the Momentum Gradient Descent optimization algorithm for training a neural network.
+
+        Parameters:
+        my_network: The neural network to be trained.
+        eta: The learning rate.
+        mom: The momentum factor.
+        previous_updates: Dictionary to store the previous updates.
+        weight_decay: A regularization parameter (default is 0).
+
+        Returns:
+        previous_updates: Updated dictionary with the previous updates.
+
+        """
+
         for l in range(1, my_network.n_layers):
             uW, ub = previous_updates["W" + str(l)], previous_updates["b" + str(l)]
             W, dW = my_network.theta["W" + str(l)], my_network.grads["dW" + str(l)]
@@ -208,7 +338,25 @@ class Update:
         key = param + str(l)
         previous_updates[key] = beta * previous_updates[key] + (1 - beta) * np.square(grads["d" + key])
         return previous_updates
+    
     def rms_prop(my_network,eta, beta, epsilon, previous_updates,weight_decay=0):
+
+        """
+            Implements the rmsprop optimization algorithm for training a neural network.
+
+            Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta: The decay rate.
+            epsilon: A small constant for numerical stability.
+            previous_updates: Dictionary to store the previous updates.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            previous_updates: Updated dictionary with the previous updates.
+
+        """
+
         for l in range(1, my_network.n_layers):
             previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "W")
             previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "b")
@@ -217,24 +365,44 @@ class Update:
             my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
             my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
             return previous_updates
-
+        
+    # calculating the factors for specifically nadam optimizer
     def calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon):
         weight_factor = eta / (np.sqrt(VW_corrected) + epsilon)
         bias_factor = eta / (np.sqrt(Vb_corrected) + epsilon)
         return weight_factor, bias_factor
-
+    
+    # calculating the terms for specifically nadam optimizer
     def calculate_terms_nadam(beta1, t, l, grads):
         term1 = 1 - (beta1 ** t)
         weight_term = (1 - beta1) * grads["dW" + str(l)] / term1
         bias_term = (1 - beta1) * grads["db" + str(l)] / term1
         return weight_term, bias_term
 
+    # updating theta for specifically nadam optimizer
     def update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay):
         my_network.theta["W" + str(l)] -= weight_factor * (beta1 * MW_corrected + weight_term) - eta * weight_decay * my_network.theta["W" + str(l)]
         my_network.theta["b" + str(l)] -= bias_factor * (beta1 * Mb_corrected + bias_term) - eta * weight_decay * my_network.theta["b" + str(l)]
 
     @staticmethod
     def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0):
+        """
+            Implements the nadam optimization algorithm for training a neural network.
+
+
+            Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta1, beta2: Exponential decay rates for the moment estimates.
+            epsilon: A small constant for numerical stability.
+            M, V: Dictionaries to store the moving averages of the gradients and squared gradients respectively.
+            t: The current timestep.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            M, V: Updated dictionaries with moving averages of the gradients and squared gradients.
+
+        """
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
@@ -253,7 +421,24 @@ class Update:
         return M, V
 
     @staticmethod
+
     def adam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0): #taken from slide-2 page 42 [cs6910]
+        """
+            Implements the Adam optimization algorithm for training a neural network.
+
+            Input Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta1, beta2: Exponential decay rates for the moment estimates.
+            epsilon: A small constant for numerical stability.
+            M, V: Dictionaries to store the moving averages of the gradients and squared gradients respectively.
+            t: The current timestep.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            M, V: Updated dictionaries with moving averages of the gradients and squared gradients.
+
+        """
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
@@ -266,7 +451,6 @@ class Update:
             my_network.theta["W" + str(l)] -= (eta / (np.sqrt(VW_hat) + epsilon)) * MW_hat -eta*weight_decay*my_network.theta["W" + str(l)]
             my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat -eta*weight_decay*my_network.theta["b" + str(l)]
         return M, V
-
 
 class MyNeuralNetwork:
   mode_of_initialization = ""
