@@ -619,6 +619,8 @@ class MyNeuralNetwork:
     # val_c_per_epoch represents the validation cost per epoch
     # val_acc_per_epoch represents the validation accuracy per epoch
     # previous_updates represents the updates of the previous epoch
+    run_name="init_"+self.mode_of_initialization+"_optimizer_"+optimizer+"_eta_"+str(eta)+"_mom_"+str(mom)+"_beta_"+str(beta)+"_beta1_"+str(beta1)+"_beta2_"+str(beta2)+"_epsilon_"+str(epsilon)+"_batch_size_"+str(batch_size)+"_weight_decay_"+str(weight_decay)+"_loss_"+loss+"_epochs_"+str(epochs)
+    wandb.run.name = run_name
     train_c_epoch, tarin_acc_per_epoch, val_c_per_epoch, val_acc_per_epoch, previous_updates, M, V = [], [], [], [], {}, {}, {}
     for l in range(1 , self.n_layers):
       previous_updates["W" + str(l)] = np.zeros((self.n_neurons[l] , self.n_neurons[l - 1]))
