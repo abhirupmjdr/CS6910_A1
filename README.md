@@ -84,6 +84,12 @@ or,
 python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"
 ```
 
+In this parameter my model gets best accuracy as of the tests I have done
+
+```
+python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh' -o 'adam' -nhl 4 -sz 128 -w_i 'Xavier' --beta1 0.9 --beta2 0.9 -lr 0.0001 -e 10 -b 32
+```
+
 Given the following where in Name column two commands are given for each hyperparameters and also for dataset. you need write the commands followed by the arguments
 
 | Name                      | Default Value | Description                                                              |
