@@ -2,22 +2,22 @@
 
 ## Description
 
-This codebase presents a neural network class designed for classification tasks. It offers functionalities for initializing weights, forward propagation, and backpropagation. Various optimization algorithms such as stochastic gradient descent (SGD), momentum, Nesterov accelerated gradient (NAG), RMSprop, Adam, and Nadam are implemented to update the network parameters. The training script `train.py` allows for easy training of a classification model using either the `mnist` or `fashion_mnist` dataset. Additionally, the script facilitates customization of parameters through user input or via default values.
+This codebase presents a neural network class designed for classification tasks. It offers functionalities for initializing weights, forward propagation, and backpropagation. Various optimization algorithms such as stochastic gradient descent (SGD), momentum, Nesterov accelerated gradient (NAG), RMSprop, Adam, and Nadam are implemented to update the network parameters. The training script [`train.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/train.py) allows for easy training of a classification model using either the `mnist` or `fashion_mnist` dataset. Additionally, the script facilitates customization of parameters through user input or via default values.
 
 ## Question Tasks
 
-Each question script (e.g., `Question1.py`, `Question2.py`, etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
+Each question script (e.g., `Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
 Given the question with description of the question,
 
-- `Question1.py`: Displays images of one object from each of the 10 classes using `sweep.log`.
-- `Question2.py`: Implements the forward function, initializing parameters, and predicting class probabilities for input samples.
-- `Question3.py`: Implements the backpropagation algorithm to compute parameter gradients for each layer. Offers various optimization algorithms for gradient descent.
-- `Question4.py`, `Question5`, and `Question6`: Utilizes sweep for hyperparameter tuning to achieve optimal model configurations. Generates multiple plots for analysis and Observations are drawn from the graphs obtained in previous stages.
-- `Question7.py`: Creates a confusion matrix using sweep and provides observations.
-- `Question8.py`: Incorporates mean squared error loss alongside categorical cross-entropy loss. Uses optimal model configurations obtained from sweep for analysis.
-- `Question10.py`: Demonstrates achieving good accuracy on the `mnist` dataset using only three hyperparameter configurations.
+- [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py): Displays images of one object from each of the 10 classes using `sweep.log`.
+- [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py): Implements the forward function, initializing parameters, and predicting class probabilities for input samples.
+- [`Question3.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question3.py): Implements the backpropagation algorithm to compute parameter gradients for each layer. Offers various optimization algorithms for gradient descent.
+- [`Question4.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question4_5.py), [`Question5`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question4_5.py), and [`Question6`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question6.py): Utilizes sweep for hyperparameter tuning to achieve optimal model configurations. Generates multiple plots for analysis and Observations are drawn from the graphs obtained in previous stages.
+- [`Question7.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question7.py): Creates a confusion matrix using sweep and provides observations.
+- [`Question8.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question8.py): Incorporates mean squared error loss alongside categorical cross-entropy loss. Uses optimal model configurations obtained from sweep for analysis.
+- [`Question10.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question10.py): Demonstrates achieving good accuracy on the `mnist` dataset using only three hyperparameter configurations.
 
-
+- [`train.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/train.py): a code for training the dataset where just downloading this file we can change hyperparameres accordingly and it will the logged to the respective wandb account and project.
 
 ## Installation
 
@@ -60,7 +60,7 @@ To deploy this project run `train.py` using,
 python train.py --wandb_entity myname --wandb_project myprojectname
 ```
 
-The above code will work with the default value that is given into the default value parameters. The default parameters are given in such a way that it gives almost maximum accuracy among the combinations of hyperparameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings. And in the project name field fill the project name where it will be logged
+The above code will work with the default value that is given into the default value parameters. The default parameters are given in such a way that it gives almost maximum accuracy among the combinations of hyperparameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link [here](https://wandb.ai/settings). And in the project name field fill the project name where it will be logged
 
 Next, you can customize parameters according to your choice like for example let say you want to do 5 `epochs` so we need to use the following code,
 
