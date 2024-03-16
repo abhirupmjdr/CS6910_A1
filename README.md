@@ -49,7 +49,7 @@ For google-colab or kaggle or any other notebooks you can use the following comm
 
 ```
 
-**Note:** We are not using `tensorflow` in our code but it is required for wandb
+**Note:** We are not using `tensorflow` in our code but it is required for wandb.
 
 ## Running the model
 
@@ -60,9 +60,9 @@ To deploy this project run `train.py` using,
 python train.py --wandb_entity myname --wandb_project myprojectname
 ```
 
-the above code will work with the default value that is given into the default value parameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings
+The above code will work with the default value that is given into the default value parameters. The default parameters are given in such a way that it gives almost maximum accuracy among the combinations of hyperparameters. And in the place of `myname`, please select a wandb entity whether it is **team name** or **single user** name or **org** name.  you can find this in the following link https://wandb.ai/settings. And in the project name field fill the project name where it will be logged
 
-Next, you can customize parameters according to your choice like for an example let say you want to do 5 `epochs` so we need to use the following code,
+Next, you can customize parameters according to your choice like for example let say you want to do 5 `epochs` so we need to use the following code,
 
 ```
 python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5`
@@ -73,7 +73,7 @@ or,
 python train.py --wandb_entity myname --wandb_project myprojectname -e 5
 ```
 
-you can use multiple parameters to get your desired output.Let say you want to do 5 `epochs` having 4 layers of neurons and in each layer there are 64 nodes with the activation function as tanh, then you need to use the following code,
+you can use multiple parameters to get your desired output. Let say you want to do 5 `epochs` having 4 layers of neurons and in each layer there are 64 nodes with the activation function as tanh, then you need to use the following code,
 ```
 python train.py --wandb_entity myname --wandb_project myprojectname --num_layers 4 --hidden_size 64 --activation "tanh"
 ```
@@ -84,13 +84,14 @@ or,
 python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"
 ```
 
-In this parameter my model gets best accuracy as of the tests I have done
+Here I have given another example of how every required hyperparameter can be manipulated.
 
 ```
-python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh' -o 'adam' -nhl 4 -sz 128 -w_i 'Xavier' --beta1 0.9 --beta2 0.9 -lr 0.0001 -e 10 -b 32
+python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh' -o 'adam' -nhl 3 -sz 32 -w_i 'Xavier' --beta1 0.9 --beta2 0.99 -lr 0.001 -e 5 -b 32
 ```
+In the above code --wandb_entity value  is `abhirupmjdr_dl` and project is my that project where it will be logged which is `cs6910-a1`.
 
-Given the following where in Name column two commands are given for each hyperparameters and also for dataset. you need write the commands followed by the arguments
+Given the following where in the Name column two commands are given for each hyperparameter and also for the dataset. you need to write the any of the two commands followed by the arguments
 
 | Name                      | Default Value | Description                                                              |
 |---------------------------|---------------|--------------------------------------------------------------------------|
@@ -100,7 +101,7 @@ Given the following where in Name column two commands are given for each hyperpa
 | `--epochs` (`-e`)         | 10             | Number of epochs to train the neural network.                           |
 | `--batch_size` (`-b`)     | 32             | Batch size used to train the neural network.                            |
 | `--loss` (`-l`)           | cross_entropy | Loss function to be used. Choices: ["mean_squared_error", "cross_entropy"]. |
-| `--optimizer` (`-o`)      | adam           | Optimization algorithm to be used. Choices: ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]. |
+| `--optimizer` (`-o`)      | nadam           | Optimization algorithm to be used. Choices: ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]. |
 | `--learning_rate` (`-lr`) | 0.0001           | Learning rate used to optimize model parameters.                       |
 | `--momentum` (`-m`)       | 0.5           | Momentum used by momentum and nag optimizers.                           |
 | `--beta`                   | 0.9           | Beta used by rmsprop optimizer.                                         |
