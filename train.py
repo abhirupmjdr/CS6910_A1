@@ -1,6 +1,8 @@
 
 '''
 importing the required libraries
+
+libraries used are:
 wandb is used to track the experiments and the results
 numpy is used for numerical computations
 sklearn is used for splitting the data into training and validation data
