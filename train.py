@@ -61,7 +61,7 @@ parser.add_argument('-d', '--dataset', default='fashion_mnist', choices=["mnist"
 parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to train neural network.')
 parser.add_argument('-b', '--batch_size', type=int, default=32, help='Batch size used to train neural network.')
 parser.add_argument('-l', '--loss', default='cross_entropy', choices=["mean_squared_error", "cross_entropy"], help='Loss function to be used.')
-parser.add_argument('-o', '--optimizer', default='adam', choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"], help='Optimizer algorithm.')
+parser.add_argument('-o', '--optimizer', default='nadam', choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"], help='Optimizer algorithm.')
 parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001, help='Learning rate used to optimize model parameters')
 parser.add_argument('-m', '--momentum', type=float, default=0.5, help='Momentum used by momentum and nag optimizers.')
 parser.add_argument('-beta', '--beta', type=float, default=0.5, help='Beta used by rmsprop optimizer')
