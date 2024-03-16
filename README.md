@@ -91,6 +91,12 @@ python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh
 ```
 In the above code --wandb_entity value  is `abhirupmjdr_dl` and project is my that project where it will be logged which is `cs6910-a1`.
 
+**Note:** If google colab or kaggle or jupyter notebook is used then use an `!` before the line. For an example running our last example in google colab will be like,
+```
+!python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh' -o 'adam' -nhl 3 -sz 32 -w_i 'Xavier' --beta1 0.9 --beta2 0.99 -lr 0.001 -e 5 -b 32
+
+```
+
 Given the following where in the Name column two commands are given for each hyperparameter and also for the dataset. you need to write the any of the two commands followed by the arguments
 
 | Name                      | Default Value | Description                                                              |
@@ -139,4 +145,6 @@ No, only `train.py` file is sufficient but you can also see the implementation f
 
 Yes, you can as many optimization and/or activation functions you want to. You just need to write the implementationand pass the parameters.
 
+#### 4. What is copy.js?
 
+It is not related to the Deep Neural Netowrk model, it is a script file which allows us to add a copy a button in the markdown (i.e readme.md) file to copy with a single click. Although it is supported by most of the browsers but still for safety reason to work almost with all browsers I have added it
