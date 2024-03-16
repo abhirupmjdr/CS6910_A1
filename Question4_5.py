@@ -459,6 +459,27 @@ class Update:
 
 
 class MyNeuralNetwork:
+  
+
+  '''
+    Initilizing the followings parameters with default values, which can be changed by the user:
+
+    mode_of_initialization: The method used to initialize the weights and biases of the neural network
+    n_layers: The number of layers in the neural network
+    activation_function: The activation function used in the hidden layers of the neural network
+    n_input: The number of input neurons in the input layer of the neural network
+    n_output: The number of output neurons in the output layer of the neural network
+    n_neurons: The number of neurons in each hidden layer of the neural network
+    TrainInput: The input data used to train the neural network
+    TrainOutput: The output data used to train the neural network
+    ValInput: The input data used to validate the neural network
+    ValOutput: The output data used to validate the neural network
+    theta: The parameters of the neural network
+    cache: The cache of the neural network
+    grads: The gradients of the neural network
+  
+  '''
+
   mode_of_initialization = ""
   n_layers = 0
   activation_function = ""
@@ -510,6 +531,7 @@ class MyNeuralNetwork:
 
 
   def __init__(self,mode_of_initialization="random",number_of_hidden_layers=1,num_neurons_in_hidden_layers=4,activation="sigmoid",TrainInput=x_train_T,TrainOutput=y_train_T,ValInput=x_val_T,ValOutput=y_val_T):
+
     self.mode_of_initialization = mode_of_initialization
     self.activation_function = activation
     self.TrainInput = TrainInput
@@ -535,6 +557,18 @@ class MyNeuralNetwork:
 
     
   def forward(self, X, activation, theta):
+    '''
+    The forward function is used to calculate the output of the neural network using the input data and the parameters of the neural network.
+
+    parameters:
+
+    X: The input data to the neural network
+    activation: The activation function used in the hidden layers of the neural network
+    theta: The parameters of the neural network
+
+    returns:
+    y_hat: The output of the neural network
+    '''
     self.cache["H0"] = X
     for l in range(1, self.n_layers):
         self.cache["A" + str(l)] = np.dot(self.theta["W" + str(l)], self.cache["H" + str(l - 1)]) + self.theta["b" + str(l)]
@@ -546,6 +580,18 @@ class MyNeuralNetwork:
     return y_hat
 
   def backpropagation(self, y_predicted, e_y, batch_size, loss, activation, theta):
+        '''
+        This function is used to calculate the gradients of the weights and biases of the neural network using the backpropagation algorithm.
+
+        paremeters:
+        y_predicted: The output predicted by the neural network
+        e_y: The true output of the neural network
+        batch_size: The size of the batch for each iteration of training
+        loss: The loss function to be minimized
+        activation: The activation function used in the hidden layers of the neural network
+        theta: The parameters of the neural network
+
+        '''
         if loss == 'cross_entropy':
             dA = y_predicted - e_y
         elif loss=='mean_squared_error':

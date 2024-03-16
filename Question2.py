@@ -169,6 +169,16 @@ class NeuralNetwork:
 
     # Method to perform a forward pass
     def forward(self, X):
+        '''
+    The forward function is used to calculate the output of the neural network using the input data and the parameters of the neural network.
+
+    parameters:
+
+    X: The input data to the neural network
+
+    returns:
+    y_hat: The output of the neural network
+    '''
         self.cache["H0"] = X
         for l in range(1, self.n_layers):
             W = self.theta["W" + str(l)]
