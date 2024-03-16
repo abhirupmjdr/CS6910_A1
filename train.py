@@ -1,4 +1,14 @@
 
+'''
+importing the required libraries
+wandb is used to track the experiments and the results
+numpy is used for numerical computations
+sklearn is used for splitting the data into training and validation data
+keras is used to load the dataset
+matplotlib is used to plot the confusion matrix
+warnings is used to ignore the warnings
+'''
+
 import wandb
 from wandb.keras import WandbCallback
 import numpy as np
@@ -6,13 +16,39 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay
 from keras.datasets import mnist, fashion_mnist
 import matplotlib.pyplot as plt
-import seaborn
 import warnings
 warnings.filterwarnings("ignore")
 
 wandb.login()
 project_name = "cs6910-assignment1"
 entity_name = "cs23m006"
+
+
+'''
+setting up command line arguments for the train.py file
+
+Parameters:
+- wp: wandb_project: The name of the project used to track experiments in the wandb dashboard
+- we: wandb_entity: The entity used to track experiments in the wandb dashboard
+- d: dataset: The dataset used to train the neural network
+- e: epochs: The number of epochs to train the neural network
+- b: batch_size: The size of the batch for each iteration of training
+- l: loss: The loss function to be minimized
+- o: optimizer: The optimizer algorithm used to train the neural network
+- lr: learning_rate: The learning rate used to optimize the model parameters
+- m: momentum: The momentum used by the momentum and nag optimizers
+- beta: beta: The beta used by the rmsprop optimizer
+- beta1: beta1: The beta1 used by the adam and nadam optimizers
+- beta2: beta2: The beta2 used by the adam and nadam optimizers
+- eps: epsilon: The epsilon used by the optimizers
+- w_d: weight_decay: The weight decay used by the optimizers
+- w_i: weight_init: The weight initialization method
+- nhl: num_layers: The number of hidden layers used in the feedforward neural network
+- sz: hidden_size: The number of hidden neurons in a feedforward layer
+- a: activation: The activation function used in the hidden layers of the neural network
+
+this passes the arguments and model gets trained with the given parameters
+'''
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser for my neural network train.py file.')
