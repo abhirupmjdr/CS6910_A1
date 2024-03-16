@@ -59,7 +59,7 @@ parser.add_argument('-wp', '--wandb_project', default='cs6910-a1', help='Project
 parser.add_argument('-we', '--wandb_entity', default='abhirupmjdr_dl', help='Wandb Entity used to track experiments in the Weights & Biases dashboard.')
 parser.add_argument('-d', '--dataset', default='fashion_mnist', choices=["mnist", "fashion_mnist"], help='Dataset to be used for training.')
 parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to train neural network.')
-parser.add_argument('-b', '--batch_size', type=int, default=32, help='Batch size used to train neural network.')
+parser.add_argument('-b', '--batch_size', type=int, default=16, help='Batch size used to train neural network.')
 parser.add_argument('-l', '--loss', default='cross_entropy', choices=["mean_squared_error", "cross_entropy"], help='Loss function to be used.')
 parser.add_argument('-o', '--optimizer', default='nadam', choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"], help='Optimizer algorithm.')
 parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001, help='Learning rate used to optimize model parameters')

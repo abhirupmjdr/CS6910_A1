@@ -105,7 +105,7 @@ Given the following where in the Name column two commands are given for each hyp
 | `--wandb_project` (`-wp`) | myprojectname | Project name used to track experiments in Weights & Biases dashboard.    |
 | `--dataset` (`-d`)        | fashion_mnist | Dataset to be used for training. Choices: ["mnist", "fashion_mnist"].   |
 | `--epochs` (`-e`)         | 10             | Number of epochs to train the neural network.                           |
-| `--batch_size` (`-b`)     | 32             | Batch size used to train the neural network.                            |
+| `--batch_size` (`-b`)     | 16             | Batch size used to train the neural network.                            |
 | `--loss` (`-l`)           | cross_entropy | Loss function to be used. Choices: ["mean_squared_error", "cross_entropy"]. |
 | `--optimizer` (`-o`)      | nadam           | Optimization algorithm to be used. Choices: ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]. |
 | `--learning_rate` (`-lr`) | 0.0001           | Learning rate used to optimize model parameters.                       |
