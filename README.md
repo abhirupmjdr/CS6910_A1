@@ -6,7 +6,7 @@ This codebase presents a neural network class designed for classification tasks.
 
 ## Question Tasks
 
-Each question script (e.g., `Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
+Each question script (e.g., []`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
 Given the question with description of the question,
 
 - [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py): Displays images of one object from each of the 10 classes using `sweep.log`.
@@ -53,7 +53,7 @@ For google-colab or kaggle or any other notebooks you can use the following comm
 
 ## Running the model
 
-To deploy this project run `train.py` using,
+To deploy this project run [`train.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/train.py) using,
 
 
 ```
@@ -139,7 +139,7 @@ Yes, you can run it in your Mac, Windows, or linux machine. Also you can use it 
 
 #### 2. Do we need to download all `.py` files?
 
-No, only `train.py` file is sufficient but you can also see the implementation from other files.
+No, only [`train.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/train.py) file is sufficient but you can also see the implementation from other files.
 
 #### 3. Can we add more functions ?
 
