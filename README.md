@@ -97,20 +97,20 @@ Given the following where in Name column two commands are given for each hyperpa
 | `--wandb_entity` (`-we`)  | myname        | Wandb Entity used to track experiments in the Weights & Biases dashboard.|
 | `--wandb_project` (`-wp`) | myprojectname | Project name used to track experiments in Weights & Biases dashboard.    |
 | `--dataset` (`-d`)        | fashion_mnist | Dataset to be used for training. Choices: ["mnist", "fashion_mnist"].   |
-| `--epochs` (`-e`)         | 1             | Number of epochs to train the neural network.                           |
-| `--batch_size` (`-b`)     | 4             | Batch size used to train the neural network.                            |
+| `--epochs` (`-e`)         | 10             | Number of epochs to train the neural network.                           |
+| `--batch_size` (`-b`)     | 32             | Batch size used to train the neural network.                            |
 | `--loss` (`-l`)           | cross_entropy | Loss function to be used. Choices: ["mean_squared_error", "cross_entropy"]. |
-| `--optimizer` (`-o`)      | sgd           | Optimization algorithm to be used. Choices: ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]. |
-| `--learning_rate` (`-lr`) | 0.1           | Learning rate used to optimize model parameters.                       |
+| `--optimizer` (`-o`)      | adam           | Optimization algorithm to be used. Choices: ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]. |
+| `--learning_rate` (`-lr`) | 0.0001           | Learning rate used to optimize model parameters.                       |
 | `--momentum` (`-m`)       | 0.5           | Momentum used by momentum and nag optimizers.                           |
-| `--beta`                   | 0.5           | Beta used by rmsprop optimizer.                                         |
-| `--beta1`, `--beta2`       | 0.5           | Beta1 and Beta2 used by adam and nadam optimizers.                      |
+| `--beta`                   | 0.9           | Beta used by rmsprop optimizer.                                         |
+| `--beta1`, (`--beta2`)       | 0.9           | Beta1 and Beta2 used by adam and nadam optimizers.                      |
 | `--epsilon` (`-eps`)      | 0.000001      | Epsilon used by optimizers.                                             |
 | `--weight_decay` (`-w_d`) | .0            | Weight decay used by optimizers.                                        |
-| `--weight_init` (`-w_i`)  | random        | Weight initialization method. Choices: ["random", "Xavier"].            |
-| `--num_layers` (`-nhl`)   | 1             | Number of hidden layers used in feedforward neural network.            |
-| `--hidden_size` (`-sz`)   | 4             | Number of hidden neurons in a feedforward layer.                       |
-| `--activation` (`-a`)     | sigmoid       | Activation function used. Choices: ["identity", "sigmoid", "tanh", "ReLU"] |
+| `--weight_init` (`-w_i`)  | Xavier        | Weight initialization method. Choices: ["random", "Xavier"].            |
+| `--num_layers` (`-nhl`)   | 4             | Number of hidden layers used in feedforward neural network.            |
+| `--hidden_size` (`-sz`)   | 128             | Number of hidden neurons in a feedforward layer.                       |
+| `--activation` (`-a`)     | tanh       | Activation function used. Choices: ["identity", "sigmoid", "tanh", "ReLU"] |
 
 
 ## Project Report (on Wandb)
