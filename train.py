@@ -324,7 +324,7 @@ class Update:
             W, dW = theta["W" + str(l)], grads["dW" + str(l)]
             b, db = theta["b" + str(l)],grads["db" + str(l)]
             W -= eta * dW -eta*weight_decay*W
-            b -= eta * db -eta*weight_decay*b
+            b -= eta * db
             theta["W" + str(l)], theta["b" + str(l)] = W, b
     # computing the theta for specifically nesterov accelerated gradient descent
     def compute_theta(my_network, mom, previous_updates):
@@ -344,7 +344,7 @@ class Update:
     def update_theta(my_network, eta, weight_decay):
         for l in range(1, my_network.n_layers):
             my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)] -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)]
 
     def nesterov_gradient_descent(my_network, i, eta, batch_size, mom, previous_updates, loss, weight_decay=0):
 
@@ -407,7 +407,7 @@ class Update:
             uW = mom * uW + (1-mom) * dW
             ub = mom * ub + (1-mom) * db
             W -= eta * uW -eta*weight_decay*W
-            b -= eta * ub  -eta*weight_decay*b
+            b -= eta * ub 
             previous_updates["W" + str(l)], previous_updates["b" + str(l)] = uW, ub
             my_network.theta["W" + str(l)], my_network.theta["b" + str(l)] = W, b
             return previous_updates
@@ -442,7 +442,7 @@ class Update:
             factorW = eta / (np.sqrt(previous_updates["W" + str(l)] + epsilon))
             factorb = eta / (np.sqrt(previous_updates["b" + str(l)] + epsilon))
             my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)]
             return previous_updates
         
     # calculating the factors for specifically nadam optimizer
@@ -461,7 +461,7 @@ class Update:
     # updating theta for specifically nadam optimizer
     def update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay):
         my_network.theta["W" + str(l)] -= weight_factor * (beta1 * MW_corrected + weight_term) - eta * weight_decay * my_network.theta["W" + str(l)]
-        my_network.theta["b" + str(l)] -= bias_factor * (beta1 * Mb_corrected + bias_term) - eta * weight_decay * my_network.theta["b" + str(l)]
+        my_network.theta["b" + str(l)] -= bias_factor * (beta1 * Mb_corrected + bias_term)
 
     @staticmethod
     def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0):
@@ -528,7 +528,7 @@ class Update:
             VW_hat = V["W" + str(l)] / (1 - np.power(beta2,t))
             Vb_hat = V["b" + str(l)] / (1 - np.power(beta2,t))
             my_network.theta["W" + str(l)] -= (eta / (np.sqrt(VW_hat) + epsilon)) * MW_hat -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat 
         return M, V
 
 # defining the neural network class

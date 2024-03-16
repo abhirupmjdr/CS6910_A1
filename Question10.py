@@ -142,33 +142,97 @@ class Compute:
 class Update:
     @staticmethod
     def stochastic_gradient_descent(eta,theta,grads,n_layers,weight_decay=0):
+        """
+        Implements the Stochastic Gradient Descent (SGD) optimization algorithm for training a neural network.
+
+        Parameters:
+        eta: The learning rate.
+        theta: The parameters of the neural network.
+        grads: The gradients of the parameters.
+        n_layers: The number of layers in the neural network.
+        weight_decay: A regularization parameter (default is 0).
+
+        """
         for l in range(1, n_layers):
             W, dW = theta["W" + str(l)], grads["dW" + str(l)]
             b, db = theta["b" + str(l)],grads["db" + str(l)]
             W -= eta * dW -eta*weight_decay*W
-            b -= eta * db -eta*weight_decay*b
+            b -= eta * db
             theta["W" + str(l)], theta["b" + str(l)] = W, b
-
-    @staticmethod
-    def nesterov_gradient_descent(my_network,i,eta, batch_size, mom, previous_updates,loss,weight_decay=0):
+    # computing the theta for specifically nesterov accelerated gradient descent
+    def compute_theta(my_network, mom, previous_updates):
         theta = {}
-        input_data = my_network.TrainInput[:, i:i + batch_size]
-        output_data = my_network.TrainOutput[0, i:i + batch_size]
         for l in range(1, my_network.n_layers):
             theta["W" + str(l)] = my_network.theta["W" + str(l)] - mom * previous_updates["W" + str(l)]
             theta["b" + str(l)] = my_network.theta["b" + str(l)] - mom * previous_updates["b" + str(l)]
-        y_predicted = my_network.forward(input_data, my_network.activation_function, my_network.theta)
-        e_y = np.transpose(np.eye(my_network.n_output)[output_data])
-        my_network.backpropagation(y_predicted, e_y, batch_size, loss, my_network.activation_function, my_network.theta)
+        return theta
+    # computing the previous updates for specifically nesterov accelerated gradient descent
+    def compute_previous_updates(my_network, mom, previous_updates):
         for l in range(1, my_network.n_layers):
             previous_updates["W" + str(l)] = mom * previous_updates["W" + str(l)] + (1-mom)*my_network.grads["dW" + str(l)]
             previous_updates["b" + str(l)] = mom * previous_updates["b" + str(l)] + (1-mom)*my_network.grads["db" + str(l)]
+        return previous_updates
+    
+    #updating the weights and biases based on the gradients using the nesterov accelerated gradient descent algorithm
+    def update_theta(my_network, eta, weight_decay):
+        for l in range(1, my_network.n_layers):
             my_network.theta["W" + str(l)] -= eta * my_network.grads["dW" + str(l)] -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= eta * my_network.grads["db" + str(l)]
+
+    def nesterov_gradient_descent(my_network, i, eta, batch_size, mom, previous_updates, loss, weight_decay=0):
+
+        """
+            Implements the Nesterov Accelerated Gradient Descent optimization algorithm for training a neural network.
+
+            Parameters:
+            my_network: The neural network to be trained.
+            i: The current iteration.
+            eta: The learning rate.
+            batch_size: The size of the batch for each iteration of training.
+            mom: The momentum factor.
+            previous_updates: Dictionary to store the previous updates.
+            loss: The loss function to be minimized.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            previous_updates: Updated dictionary with the previous updates.
+
+        """
+
+        input_data = my_network.TrainInput[:, i:i + batch_size]
+        output_data = my_network.TrainOutput[0, i:i + batch_size]
+        
+        theta = Update.compute_theta(my_network, mom, previous_updates)
+        
+        y_predicted = my_network.forward(input_data, my_network.activation_function, theta)
+        e_y = np.transpose(np.eye(my_network.n_output)[output_data])
+        
+        my_network.backpropagation(y_predicted, e_y, batch_size, loss, my_network.activation_function, theta)
+        
+        previous_updates = Update.compute_previous_updates(my_network, mom, previous_updates)
+        
+        Update.update_theta(my_network, eta, weight_decay)
+        
         return previous_updates
 
     @staticmethod
     def momentum_gradient_descent(my_network,eta, mom, previous_updates,weight_decay=0):
+
+        """
+        Implements the Momentum Gradient Descent optimization algorithm for training a neural network.
+
+        Parameters:
+        my_network: The neural network to be trained.
+        eta: The learning rate.
+        mom: The momentum factor.
+        previous_updates: Dictionary to store the previous updates.
+        weight_decay: A regularization parameter (default is 0).
+
+        Returns:
+        previous_updates: Updated dictionary with the previous updates.
+
+        """
+
         for l in range(1, my_network.n_layers):
             uW, ub = previous_updates["W" + str(l)], previous_updates["b" + str(l)]
             W, dW = my_network.theta["W" + str(l)], my_network.grads["dW" + str(l)]
@@ -176,53 +240,116 @@ class Update:
             uW = mom * uW + (1-mom) * dW
             ub = mom * ub + (1-mom) * db
             W -= eta * uW -eta*weight_decay*W
-            b -= eta * ub  -eta*weight_decay*b
+            b -= eta * ub 
             previous_updates["W" + str(l)], previous_updates["b" + str(l)] = uW, ub
             my_network.theta["W" + str(l)], my_network.theta["b" + str(l)] = W, b
             return previous_updates
 
     @staticmethod
+    def update_previous_updates(previous_updates, beta, grads, l, param):
+        key = param + str(l)
+        previous_updates[key] = beta * previous_updates[key] + (1 - beta) * np.square(grads["d" + key])
+        return previous_updates
+    
     def rms_prop(my_network,eta, beta, epsilon, previous_updates,weight_decay=0):
+
+        """
+            Implements the rmsprop optimization algorithm for training a neural network.
+
+            Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta: The decay rate.
+            epsilon: A small constant for numerical stability.
+            previous_updates: Dictionary to store the previous updates.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            previous_updates: Updated dictionary with the previous updates.
+
+        """
+
         for l in range(1, my_network.n_layers):
-            previous_updates["W" + str(l)] = beta * previous_updates["W" + str(l)] + (1 - beta) * np.square(
-                my_network.grads["dW" + str(l)])
-            previous_updates["b" + str(l)] = beta * previous_updates["b" + str(l)] + (1 - beta) * np.square(
-                my_network.grads["db" + str(l)])
+            previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "W")
+            previous_updates = Update.update_previous_updates(previous_updates, beta, my_network.grads, l, "b")
             factorW = eta / (np.sqrt(previous_updates["W" + str(l)] + epsilon))
             factorb = eta / (np.sqrt(previous_updates["b" + str(l)] + epsilon))
             my_network.theta["W" + str(l)] -= factorW * my_network.grads["dW" + str(l)] - eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)] -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= factorb * my_network.grads["db" + str(l)]
             return previous_updates
-            '''
-            Working previously fetched an issue that the previous_updates should be returned
-            if not then it is showing validation accuracy as 9.05%
-            but after returning this slightly better
-            '''
+        
+    # calculating the factors for specifically nadam optimizer
+    def calculate_factors_nadam(eta, VW_corrected, Vb_corrected, epsilon):
+        weight_factor = eta / (np.sqrt(VW_corrected) + epsilon)
+        bias_factor = eta / (np.sqrt(Vb_corrected) + epsilon)
+        return weight_factor, bias_factor
+    
+    # calculating the terms for specifically nadam optimizer
+    def calculate_terms_nadam(beta1, t, l, grads):
+        term1 = 1 - (beta1 ** t)
+        weight_term = (1 - beta1) * grads["dW" + str(l)] / term1
+        bias_term = (1 - beta1) * grads["db" + str(l)] / term1
+        return weight_term, bias_term
+
+    # updating theta for specifically nadam optimizer
+    def update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_corrected,Mb_corrected,beta1, weight_term, bias_term, eta, weight_decay):
+        my_network.theta["W" + str(l)] -= weight_factor * (beta1 * MW_corrected + weight_term) - eta * weight_decay * my_network.theta["W" + str(l)]
+        my_network.theta["b" + str(l)] -= bias_factor * (beta1 * Mb_corrected + bias_term)
 
     @staticmethod
     def nadam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0):
+        """
+            Implements the nadam optimization algorithm for training a neural network.
+
+
+            Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta1, beta2: Exponential decay rates for the moment estimates.
+            epsilon: A small constant for numerical stability.
+            M, V: Dictionaries to store the moving averages of the gradients and squared gradients respectively.
+            t: The current timestep.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            M, V: Updated dictionaries with moving averages of the gradients and squared gradients.
+
+        """
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
-            MW_corrected = M["W" + str(l)] / (1 - (beta1 ** (t)))
-            Mb_corrected = M["b" + str(l)] / (1 - (beta1 ** (t)))
+            MW_new = M["W" + str(l)] / (1 - (beta1 ** (t)))
+            Mb_new = M["b" + str(l)] / (1 - (beta1 ** (t)))
 
             V["W" + str(l)] = beta2 * V["W" + str(l)] + (1 - beta2) * np.square(my_network.grads["dW" + str(l)])
             V["b" + str(l)] = beta2 * V["b" + str(l)] + (1 - beta2) * np.square(my_network.grads["db" + str(l)])
-            VW_corrected = V["W" + str(l)] / (1 - (beta2 ** (t)))
-            Vb_corrected = V["b" + str(l)] / (1 - (beta2 ** (t)))
+            VW_new = V["W" + str(l)] / (1 - (beta2 ** (t)))
+            Vb_new = V["b" + str(l)] / (1 - (beta2 ** (t)))
 
-            factorW = eta / (np.sqrt(VW_corrected) + epsilon)
-            factorb = eta / (np.sqrt(Vb_corrected) + epsilon)
-            term1 = 1 - (beta1 ** (t))
-            term2 = (1 - beta1) * my_network.grads["dW" + str(l)] / term1
-            term3 = (1 - beta1) * my_network.grads["db" + str(l)] / term1
-            my_network.theta["W" + str(l)] -= factorW * (beta1 * MW_corrected + term2) -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= factorb * (beta1 * Mb_corrected + term3) -eta*weight_decay*my_network.theta["b" + str(l)]
+            weight_factor, bias_factor = Update.calculate_factors_nadam(eta, VW_new, Vb_new, epsilon)
+            weight_term, bias_term = Update.calculate_terms_nadam(beta1, t, l, my_network.grads)
+            Update.update_theta_nadam(my_network, l, weight_factor, bias_factor, MW_new,Mb_new,beta1, weight_term, bias_term, eta, weight_decay)
+
         return M, V
 
     @staticmethod
     def adam(my_network,eta, beta1, beta2, epsilon, M, V, t,weight_decay=0): #taken from slide-2 page 42 [cs6910]
+        """
+            Implements the Adam optimization algorithm for training a neural network.
+
+            Input Parameters:
+            my_network: The neural network to be trained.
+            eta: The learning rate.
+            beta1, beta2: Exponential decay rates for the moment estimates.
+            epsilon: A small constant for numerical stability.
+            M, V: Dictionaries to store the moving averages of the gradients and squared gradients respectively.
+            t: The current timestep.
+            weight_decay: A regularization parameter (default is 0).
+
+            Returns:
+            M, V: Updated dictionaries with moving averages of the gradients and squared gradients.
+
+        """
         for l in range(1, my_network.n_layers):
             M["W" + str(l)] = beta1 * M["W" + str(l)] + (1 - beta1) * my_network.grads["dW" + str(l)]
             M["b" + str(l)] = beta1 * M["b" + str(l)] + (1 - beta1) * my_network.grads["db" + str(l)]
@@ -233,7 +360,7 @@ class Update:
             VW_hat = V["W" + str(l)] / (1 - np.power(beta2,t))
             Vb_hat = V["b" + str(l)] / (1 - np.power(beta2,t))
             my_network.theta["W" + str(l)] -= (eta / (np.sqrt(VW_hat) + epsilon)) * MW_hat -eta*weight_decay*my_network.theta["W" + str(l)]
-            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat -eta*weight_decay*my_network.theta["b" + str(l)]
+            my_network.theta["b" + str(l)] -= (eta / (np.sqrt(Vb_hat) + epsilon)) * Mb_hat 
         return M, V
 
 
