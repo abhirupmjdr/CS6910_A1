@@ -9,7 +9,7 @@ This codebase presents a neural network class designed for classification tasks.
 Each question script (e.g., [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
 Given the question with description of the question,
 
-- [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py): Displays images of one object from each of the 10 classes using `sweep.log`.
+- [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py): Displays images of one object from each of the 10 classes using `sweep.log()`.
 - [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py): Implements the forward function, initializing parameters, and predicting class probabilities for input samples.
 - [`Question3.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question3.py): Implements the backpropagation algorithm to compute parameter gradients for each layer. Offers various optimization algorithms for gradient descent.
 - [`Question4.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question4_5.py), [`Question5`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question4_5.py), and [`Question6`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question6.py): Utilizes sweep for hyperparameter tuning to achieve optimal model configurations. Generates multiple plots for analysis and Observations are drawn from the graphs obtained in previous stages.
