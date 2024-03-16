@@ -65,7 +65,7 @@ The above code will work with the default value that is given into the default v
 Next, you can customize parameters according to your choice like for example let say you want to do 5 `epochs` so we need to use the following code,
 
 ```
-python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5`
+python train.py --wandb_entity myname --wandb_project myprojectname --epochs 5
 ```
 or,
 
