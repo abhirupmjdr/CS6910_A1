@@ -6,7 +6,7 @@ This codebase presents a neural network class designed for classification tasks.
 
 ## Question Tasks
 
-Each question script (e.g., []`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
+Each question script (e.g., [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py), [`Question2.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/Question2.py), etc.) corresponds to specific tasks using the `fashion_mnist` dataset, providing insights into various aspects of the neural network model and its performance.
 Given the question with description of the question,
 
 - [`Question1.py`](https://github.com/abhirupmjdr/CS6910_A1/blob/main/question1.py): Displays images of one object from each of the 10 classes using `sweep.log`.
@@ -36,7 +36,7 @@ conda install keras
 conda install tensorflow
 ```
 
-For google-colab or kaggle or any other notebooks you can use the following commands
+For google-colab or kaggle or any other notebooks you can use the following commands,
 
 ```
 !pip install numpy
@@ -84,7 +84,7 @@ or,
 python train.py --wandb_entity myname --wandb_project myprojectname -nhl 4 -sz 64 -a "tanh"
 ```
 
-Here I have given another example of how every required hyperparameter can be manipulated.
+Here I have given another example of how every required hyperparameter can be manipulated,
 
 ```
 python train.py --wandb_entity abhirupmjdr_dl --wandb_project cs6910-a1 -a 'tanh' -o 'adam' -nhl 3 -sz 32 -w_i 'Xavier' --beta1 0.9 --beta2 0.99 -lr 0.001 -e 5 -b 32
@@ -97,7 +97,7 @@ In the above code --wandb_entity value  is `abhirupmjdr_dl` and project is my th
 
 ```
 
-Given the following where in the Name column two commands are given for each hyperparameter and also for the dataset. you need to write the any of the two commands followed by the arguments
+Given the following where in the Name column two commands are given for each hyperparameter and also for the dataset. you need to write the any of the two commands followed by the arguments.
 
 | Name                      | Default Value | Description                                                              |
 |---------------------------|---------------|--------------------------------------------------------------------------|
@@ -122,7 +122,7 @@ Given the following where in the Name column two commands are given for each hyp
 
 ## Project Report (on Wandb)
 
-The report containing detailed observations and insights can be accessed [here](https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3)
+The report containing detailed observations and insights can be accessed [here](https://wandb.ai/abhirupmjdr_dl/deep-learning/reports/CS6910-Assignment-1--Vmlldzo2OTEyMjk3).
 
 ## Acknowledgements
 
@@ -135,7 +135,7 @@ The report containing detailed observations and insights can be accessed [here](
 
 #### 1. Is this code platfrom independent?
 
-Yes, you can run it in your Mac, Windows, or linux machine. Also you can use it in google-colab or kaggle
+Yes, you can run it in your Mac, Windows, or linux machine. Also you can use it in google-colab or kaggle.
 
 #### 2. Do we need to download all `.py` files?
 
