@@ -147,4 +147,4 @@ Yes, you can as many optimization and/or activation functions you want to. You j
 
 #### 4. What is copy.js?
 
-It is not related to the Deep Neural Netowrk model, it is a script file which allows us to add a copy a button in the markdown (i.e readme.md) file to copy with a single click. Although it is supported by most of the browsers but still for safety reason to work almost with all browsers I have added it
+It is not related to the Deep Neural Netowrk model, it is a script file which allows us to add a copy a button in the markdown (i.e. readme.md) file to copy with a single click. Although it is supported by most of the browsers but still for safety reason to work almost with all browsers I have added it.
