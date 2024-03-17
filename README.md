@@ -127,7 +127,6 @@ The report containing detailed observations and insights can be accessed [here](
 ## Acknowledgements
 
  - [CS6910: Deep Learning](https://www.cse.iitm.ac.in/~miteshk/CS6910.html)
- - [README templetes](https://github.com/matiassingers/awesome-readme)
  - Instructed by [Mitesh Khapra](https://www.cse.iitm.ac.in/~miteshk/)
  - Deep Learning TAs
 
