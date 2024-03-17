@@ -3,7 +3,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix,classification_report, accuracy_score,ConfusionMatrixDisplay
 from keras.datasets import mnist, fashion_mnist
 import matplotlib.pyplot as plt
-import seaborn
 import warnings
 warnings.filterwarnings("ignore")
 
