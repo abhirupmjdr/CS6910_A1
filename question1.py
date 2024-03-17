@@ -1,6 +1,6 @@
 #question 1
 # !pip install wandb
-# import wandb
+import wandb
 import matplotlib.pyplot as plt
 from keras.datasets import fashion_mnist
 import numpy as np
